@@ -1,6 +1,7 @@
 # Môi trường ảo Python
 .venv/
 backend/venv/
+__pycache__/
 backend/__pycache__/
 **/__pycache__/
 *.pyc
@@ -15,11 +16,12 @@ backend/.env
 frontend/.env
 *.env.local
 
-# Logs & Bộ nhớ đệm OCR
+# Logs & Bộ nhớ đệm OCR & Context dumps
 *.log
 .DS_Store
 data/.ocr_cache/
 scratch/
+project_code_context*.txt
 
 # Agent skills & local assistant rules
 .agents/
