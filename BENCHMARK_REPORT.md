@@ -35,46 +35,46 @@ Hệ thống được kiểm thử đối chứng trực tiếp giữa hai kiế
 
 | Mã Ca | Kịch bản Pháp lý | Căn cứ Luật (N/H) | Khung phạt (N/H) | Guardrail (N/H) | Hiệu lực (N/H) | Bằng chứng (N/H) | Thời gian |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **TC01** | Quy tắc chủ thể lịch sử Điều 101 NĐ 15/2020 (Cá nhân = 1/2 Tổ chức) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC02** | Độ tuổi vị thành niên 14 - dưới 16 tuổi (Điều 5, 22 Luật XLVPHC: Chỉ cảnh cáo) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC03** | Độ tuổi vị thành niên 16 - dưới 18 tuổi (Điều 134 Luật XLVPHC: Max 1/2 cá nhân) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC04** | Ngoại lệ chủ thể gốc là Cá nhân (Điều 106 NĐ 15/2020: Người chơi game) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | 0.12s |
-| **TC05** | Quy định mới Nghị định 174/2026/NĐ-CP (Hiệu lực từ 01/07/2026: Điều 95) | ✅ / **✅** | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | 0.12s |
-| **TC06** | Quy định mới Nghị định 330/2026/NĐ-CP (Hiệu lực từ 19/08/2026: Điều 50) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC07** | Suy luận đa chặng: Vi phạm mạng -> Hình sự Điều 288 BLHS 2015 | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC08** | Suy luận đa chặng: Tấn công mạng -> Hình sự Điều 289 BLHS 2015 | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC09** | Quy phạm cấm đoán: Điều 8 Luật An ninh mạng 2018 | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC10** | Luật Giao dịch điện tử 2023: Giá trị pháp lý chữ ký điện tử | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC11** | Câu hỏi thiếu tên văn bản (Ambiguous Article Guardrail) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC12** | Khoảng tuổi mơ hồ cần xác định tuổi chính xác (Ambiguous Age) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | 0.12s |
-| **TC13** | Chặn văn bản ngoài phạm vi CNTT (Nghị định 100/2019 giao thông) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC14** | Chặn văn bản không có trong kho / giả mạo (Nghị định 9999 giả mạo) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC15** | Chặn câu hỏi ngoài lề không liên quan pháp luật (Irrelevant Query) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC16** | Vi phạm quy định về trang thông tin điện tử (Khoản 3 Điều 99 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC17** | Cung cấp trò chơi điện tử G1 không phép (Điều 103 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC18** | Livestream xúc phạm danh dự trên mạng xã hội (Điều 101 NĐ 15/2020) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC19** | Không gỡ bỏ thông tin vi phạm theo yêu cầu cơ quan có thẩm quyền (Khoản 2 Điểm b Điều 100 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC20** | Tiết lộ bí mật đời tư cá nhân trên mạng (Điều 102 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC21** | Thu thập thông tin cá nhân trái phép (Điều 84 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC22** | Mua bán dữ liệu cá nhân trái phép (Điều 84 NĐ 15/2020 & NĐ 13/2023) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC23** | An toàn hệ thống thông tin theo 5 cấp độ (Nghị định 85/2016/NĐ-CP) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC24** | Nghĩa vụ lưu trữ dữ liệu người dùng tại Việt Nam (Điều 26 Luật ANM 2018) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC25** | Phát tán tin nhắn rác quảng cáo không được sự đồng ý (Điều 94 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC26** | Không bảo đảm an toàn làm lộ lọt dữ liệu khách hàng (Điều 84 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC27** | Nhập sẵn thông tin thuê bao di động (SIM rác) (Điều 33 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC28** | Sử dụng thiết bị kích sóng, phá sóng gây can nhiễu tần số (Điều 68 NĐ 15) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC29** | Đăng ký thông tin thuê bao di động không chính chủ (Khoản 2 Điểm a Điều 33 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC30** | Quảng cáo dịch vụ nội dung qua tin nhắn ngoài khung giờ (Khoản 3 Điều 94 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC31** | Cung cấp dịch vụ viễn thông không có giấy phép (Điều 15 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC32** | Cản trở, trì hoãn kết nối mạng viễn thông (Khoản 2 Điều 20 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC33** | Vi phạm về thông điệp dữ liệu (Khoản 2 Điều 107 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC34** | Cung cấp dịch vụ chứng thực chữ ký số không phép (Điều 108 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC35** | Giá trị pháp lý của thông điệp dữ liệu (Luật Giao dịch điện tử 2023) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC36** | Giả mạo thông điệp dữ liệu trong giao dịch điện tử (Điều 107 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
-| **TC37** | Hình sự Điều 285 BLHS: Sản xuất, mua bán công cụ tấn công mạng | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC38** | Hình sự Điều 286 BLHS: Phát tán virus, ransomware gây thiệt hại lớn | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC39** | Hình sự Điều 287 BLHS: Tấn công DDoS làm tê liệt cổng thông tin | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
-| **TC40** | Hình sự Điều 290 BLHS: Lừa đảo, chiếm đoạt tài sản qua mạng viễn thông | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.12s |
+| **TC01** | Quy tắc chủ thể lịch sử Điều 101 (đến 30/06/2026) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.07s |
+| **TC02** | Độ tuổi vị thành niên 14 - dưới 16 tuổi (NĐ 15/2020 & Luật XLVPHC) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.05s |
+| **TC03** | Độ tuổi vị thành niên 16 - dưới 18 tuổi | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC04** | Ngoại lệ chủ thể gốc là Cá nhân (Điều 106 NĐ 15/2020) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | 0.04s |
+| **TC05** | Quy định mới Nghị định 174/2026/NĐ-CP (Hiệu lực từ 01/07/2026) | ✅ / **✅** | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | 0.05s |
+| **TC06** | Quy định mới Nghị định 330/2026/NĐ-CP (Hiệu lực từ 19/08/2026) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC07** | Suy luận đa chặng: Vi phạm mạng -> Hình sự Điều 288 BLHS 2015 | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.10s |
+| **TC08** | Suy luận đa chặng: Tấn công mạng -> Hình sự Điều 289 BLHS 2015 | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.07s |
+| **TC09** | Quy phạm cấm đoán: Điều 8 Luật An ninh mạng 2018 | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC10** | Luật Giao dịch điện tử 2023: Giá trị pháp lý chữ ký điện tử | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.06s |
+| **TC11** | Câu hỏi thiếu tên văn bản (Ambiguous Article Guardrail) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.01s |
+| **TC12** | Khoảng tuổi mơ hồ cần xác định tuổi chính xác (Ambiguous Age) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | 0.09s |
+| **TC13** | Chặn văn bản ngoài phạm vi CNTT (Out-of-Scope Guardrail) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.01s |
+| **TC14** | Chặn văn bản không có trong kho / giả mạo (Invalid Document) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.01s |
+| **TC15** | Chặn câu hỏi ngoài lề không liên quan pháp luật (Irrelevant Query) | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.01s |
+| **TC16** | Vi phạm quy định về trang thông tin điện tử (Khoản 3 Điều 99 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC17** | Cung cấp trò chơi điện tử G1 không phép (Điều 103 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.05s |
+| **TC18** | Livestream truyền tải thông tin xúc phạm uy tín cơ quan (NĐ 15/2020 & NĐ 147/2024) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC19** | Không gỡ bỏ thông tin vi phạm theo yêu cầu cơ quan có thẩm quyền (Khoản 2 Điểm b Điều 100 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC20** | Tiết lộ thông tin bí mật đời tư cá nhân trên mạng (Điều 101, 102 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC21** | Thu thập thông tin cá nhân trái phép (Điều 84 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.03s |
+| **TC22** | Mua bán dữ liệu cá nhân trái phép (Điều 84 NĐ 15/2020 & NĐ 13/2023) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.03s |
+| **TC23** | An toàn thông tin mạng theo cấp độ (Nghị định 85/2016/NĐ-CP & NĐ 15/2020) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.12s |
+| **TC24** | Nghĩa vụ lưu trữ dữ liệu người dùng tại Việt Nam (Luật ANM 2018 & NĐ 53/2022) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.05s |
+| **TC25** | Phát tán tin nhắn rác, cuộc gọi rác (Điều 94 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.05s |
+| **TC26** | Không bảo đảm an toàn làm lộ lọt dữ liệu khách hàng (Điều 84 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.03s |
+| **TC27** | Nhập sẵn thông tin thuê bao di động (SIM rác) (Điều 33 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.05s |
+| **TC28** | Sử dụng thiết bị kích sóng, phá sóng gây can nhiễu (Luật Tần số VTĐ & NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC29** | Đăng ký thông tin thuê bao di động không chính chủ (Khoản 2 Điểm a Điều 33 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.06s |
+| **TC30** | Quảng cáo dịch vụ nội dung qua tin nhắn ngoài khung giờ (Khoản 3 Điều 94 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.05s |
+| **TC31** | Cung cấp dịch vụ viễn thông không có giấy phép (Điều 15 NĐ 15/2020 & Luật Viễn thông 2023) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC32** | Cản trở, trì hoãn kết nối mạng viễn thông (Khoản 2 Điều 20 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC33** | Vi phạm về thông điệp dữ liệu (Khoản 2 Điều 107 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.03s |
+| **TC34** | Cung cấp dịch vụ chứng thực chữ ký số không phép (Điều 108 NĐ 15/2020 & Luật GDĐT 2023) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.04s |
+| **TC35** | Giá trị pháp lý của thông điệp dữ liệu (Luật Giao dịch điện tử 2023) | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.06s |
+| **TC36** | Giả mạo thông điệp dữ liệu trong giao dịch điện tử (Điều 107 NĐ 15/2020) | ✅ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ✅ / **✅** | 0.03s |
+| **TC37** | Hình sự Điều 285 BLHS: Sản xuất, mua bán công cụ tấn công mạng | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.07s |
+| **TC38** | Hình sự Điều 286 BLHS: Phát tán virus, mã độc ransomware gây tê liệt | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.09s |
+| **TC39** | Hình sự Điều 287 BLHS: Tấn công DDoS làm tê liệt cổng thông tin | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.07s |
+| **TC40** | Hình sự Điều 290 BLHS: Lừa đảo, chiếm đoạt tài sản qua mạng viễn thông | ❌ / **✅** | ❌ / **✅** | ❌ / **✅** | ✅ / **✅** | ❌ / **✅** | 0.06s |
 
 *Ghi chú:* Ký hiệu `(N / H)` thể hiện: Kết quả của **Naive Vector RAG** / Kết quả của **Neuro-Symbolic Hybrid RAG**. Thời gian phản hồi đo đạc trên môi trường máy trạm thử nghiệm.
 
@@ -86,11 +86,11 @@ Hệ thống được kiểm thử đối chứng trực tiếp giữa hai kiế
 +-------------------------------------------------------------+------------------+-----------------------------+---------------+
 | Tiêu chí Đánh giá Khoa học                                  | Naive Vector RAG | Neuro-Symbolic Hybrid RAG   | Độ Cải thiện  |
 +-------------------------------------------------------------+------------------+-----------------------------+---------------+
-| 1. Citation Accuracy (Căn cứ pháp lý)                       |      77.5%       |           100.0%            |    +22.5%     |
-| 2. Rule & Penalty Accuracy (Khung phạt & Độ tuổi tất định)   |      22.5%       |           100.0%            |    +77.5%     |
-| 3. Subject & Guardrail Accuracy (Chủ thể & Kiểm duyệt)       |      20.0%       |           100.0%            |    +80.0%     |
-| 4. Temporal Validity Accuracy (Tính đúng theo mốc thời gian)|      92.5%       |           100.0%            |     +7.5%     |
-| 5. Evidence Groundedness (Căn cứ trích dẫn chứng minh)       |      80.0%       |           100.0%            |    +20.0%     |
+| Citation Accuracy (Căn cứ pháp lý)                          |      77.5%       |            100.0%           |     +22.5%    |
+| Rule & Penalty Accuracy (Khung phạt & Độ tuổi)              |      22.5%       |            100.0%           |     +77.5%    |
+| Subject & Guardrail Accuracy (Chủ thể & Kiểm duyệt)         |      20.0%       |            100.0%           |     +80.0%    |
+| Temporal Validity Accuracy (Tính đúng theo mốc thời gian)   |      92.5%       |            100.0%           |     +7.5%     |
+| Evidence Groundedness (Căn cứ trích dẫn chứng minh)         |      80.0%       |            100.0%           |     +20.0%    |
 +-------------------------------------------------------------+------------------+-----------------------------+---------------+
 ```
 

@@ -118,7 +118,7 @@ py -m venv .venv
 python -m pip install -r backend/requirements.txt
 ```
 
-Chạy bộ kiểm thử tự động để xác nhận toàn bộ 25 unit tests đều passed:
+Chạy bộ kiểm thử tự động để xác nhận toàn bộ 92 unit tests đều passed:
 ```powershell
 python -m unittest discover -s backend/tests -v
 ```
