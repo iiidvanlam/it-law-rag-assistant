@@ -6,6 +6,10 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+
 from dotenv import load_dotenv
 
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -38,9 +42,10 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 OPENROUTER_CHAT_MODEL = os.getenv("OPENROUTER_CHAT_MODEL", "deepseek/deepseek-chat")
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", os.getenv("OPENROUTER_MAX_TOKENS", "2048")))
+LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", "45"))
 
 
-def create_llm(temperature: float = 0.0, timeout: int = 120, max_tokens: int | None = None):
+def create_llm(temperature: float = 0.0, timeout: int | None = None, max_tokens: int | None = None):
     """Ưu tiên DeepSeek API gốc nếu có DEEPSEEK_API_KEY, ngược lại dùng OpenRouter."""
     from langchain_openai import ChatOpenAI
 
@@ -50,6 +55,8 @@ def create_llm(temperature: float = 0.0, timeout: int = 120, max_tokens: int | N
     limit_tokens = max_tokens or int(
         os.getenv("LLM_MAX_TOKENS", os.getenv("OPENROUTER_MAX_TOKENS", "2048"))
     )
+    request_timeout = timeout if timeout is not None else LLM_TIMEOUT_SECONDS
+    request_retries = int(os.getenv("LLM_MAX_RETRIES", "1"))
 
     if deepseek_key:
         return ChatOpenAI(
@@ -58,8 +65,8 @@ def create_llm(temperature: float = 0.0, timeout: int = 120, max_tokens: int | N
             base_url=os.getenv("DEEPSEEK_BASE_URL", DEEPSEEK_BASE_URL),
             temperature=temperature,
             max_tokens=limit_tokens,
-            max_retries=3,
-            timeout=timeout,
+            max_retries=request_retries,
+            timeout=request_timeout,
         )
     if openrouter_key:
         return ChatOpenAI(
@@ -68,8 +75,8 @@ def create_llm(temperature: float = 0.0, timeout: int = 120, max_tokens: int | N
             base_url=os.getenv("OPENROUTER_BASE_URL", OPENROUTER_BASE_URL),
             temperature=temperature,
             max_tokens=limit_tokens,
-            max_retries=3,
-            timeout=timeout,
+            max_retries=request_retries,
+            timeout=request_timeout,
         )
     raise RuntimeError(
         "Thiếu khóa LLM. Khai báo DEEPSEEK_API_KEY hoặc OPENROUTER_API_KEY trong backend/.env."
@@ -85,7 +92,10 @@ def get_embeddings():
 
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("Thiếu OPENAI_API_KEY trong backend/.env.")
-        return OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL", OPENAI_EMBEDDING_MODEL))
+        return OpenAIEmbeddings(
+            model=os.getenv("OPENAI_EMBEDDING_MODEL", OPENAI_EMBEDDING_MODEL),
+            request_timeout=3.0,
+        )
     if provider == "gemini":
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
@@ -95,6 +105,7 @@ def get_embeddings():
         return GoogleGenerativeAIEmbeddings(
             model=os.getenv("GEMINI_EMBEDDING_MODEL", EMBEDDING_MODEL),
             google_api_key=api_key,
+            request_options={"timeout": 3.0},
         )
     raise RuntimeError("EMBEDDING_PROVIDER phải là 'gemini' hoặc 'openai'.")
 
@@ -109,7 +120,7 @@ def create_neo4j_driver():
     return GraphDatabase.driver(
         NEO4J_URI,
         auth=(NEO4J_USER, NEO4J_PASSWORD),
-        connection_timeout=3.0,
-        connection_acquisition_timeout=4.0,
+        connection_timeout=1.5,
+        connection_acquisition_timeout=2.0,
         max_connection_pool_size=20,
     )

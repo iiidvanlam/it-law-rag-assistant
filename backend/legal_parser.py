@@ -195,6 +195,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Luật Giao dịch điện tử 2023 (Luật số 20/2023/QH15)",
         "short": "Luật Giao dịch điện tử 2023",
         "type": "LAW",
+        "effective_from": "2024-07-01",
     },
     {
         "pattern": r"^luat24\.pdf$|24-2023-qh15",
@@ -202,6 +203,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Luật Viễn thông 2023 (Luật số 24/2023/QH15)",
         "short": "Luật Viễn thông 2023",
         "type": "LAW",
+        "effective_from": "2024-07-01",
     },
     {
         "pattern": r"^luat60\.pdf$|60-2024-qh15",
@@ -209,6 +211,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Luật Dữ liệu 2024 (Luật số 60/2024/QH15)",
         "short": "Luật Dữ liệu 2024",
         "type": "LAW",
+        "effective_from": "2025-07-01",
     },
     {
         "pattern": r"07-2022-qh15",
@@ -241,11 +244,14 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
     {
         "pattern": r"20-2026-QH16",
         "code": "20/2026/QH16",
-        "title": "Luật số 20/2026/QH16 sửa đổi Luật Tần số vô tuyến điện, Luật Viễn thông, Luật Giao dịch điện tử",
-        "short": "Luật sửa đổi Viễn thông & GDĐT 2026",
+        "title": (
+            "Luật số 20/2026/QH16 sửa đổi, bổ sung một số điều của Luật Tần số vô tuyến điện, "
+            "Luật Viễn thông, Luật Giao dịch điện tử và Luật Chuyển giao công nghệ"
+        ),
+        "short": "Luật sửa đổi Tần số VTĐ, Viễn thông, GDĐT & CGCN 2026",
         "type": "LAW",
-        "effective_from": "2026-10-01",
-        "amends": ["42/2009/QH12", "24/2023/QH15", "20/2023/QH15"],
+        "effective_from": "2026-07-01",
+        "amends": ["42/2009/QH12", "24/2023/QH15", "20/2023/QH15", "07/2017/QH14"],
     },
     {
         "pattern": r"100-2015-QH13",
@@ -268,6 +274,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân",
         "short": "Nghị định 13/2023/NĐ-CP (Bảo vệ DLCN)",
         "type": "DECREE",
+        "effective_from": "2023-07-01",
     },
     {
         "pattern": r"^147-nd\.signed\.pdf$",
@@ -275,6 +282,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng",
         "short": "Nghị định 147/2024/NĐ-CP (Internet & MXH)",
         "type": "DECREE",
+        "effective_from": "2024-12-25",
     },
     {
         "pattern": r"^163nd\.signed\.pdf$",
@@ -282,6 +290,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Nghị định 163/2024/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Viễn thông",
         "short": "Nghị định 163/2024/NĐ-CP (Hướng dẫn Luật Viễn thông)",
         "type": "DECREE",
+        "effective_from": "2024-12-24",
     },
     {
         "pattern": r"^165nd\.signed\.pdf$",
@@ -289,6 +298,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Nghị định 165/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Dữ liệu",
         "short": "Nghị định 165/2025/NĐ-CP (Hướng dẫn Luật Dữ liệu)",
         "type": "DECREE",
+        "effective_from": "2025-07-01",
     },
     {
         "pattern": r"^23-cp\.signed\.pdf$",
@@ -296,6 +306,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Nghị định 23/2025/NĐ-CP quy định về chữ ký điện tử và dịch vụ tin cậy",
         "short": "Nghị định 23/2025/NĐ-CP (Chữ ký điện tử)",
         "type": "DECREE",
+        "effective_from": "2025-04-10",
     },
     {
         "pattern": r"^356-nd\.signed\.pdf$",
@@ -303,6 +314,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Nghị định 356/2025/NĐ-CP quy định chi tiết Luật Bảo vệ dữ liệu cá nhân",
         "short": "Nghị định 356/2025/NĐ-CP",
         "type": "DECREE",
+        "effective_from": "2026-01-01",
     },
     {
         "pattern": r"^142-2026-ndcp\.signed\.pdf$",
@@ -362,6 +374,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Luật Công nghiệp công nghệ số 2025 (Luật số 71/2025/QH15)",
         "short": "Luật Công nghiệp công nghệ số 2025",
         "type": "LAW",
+        "effective_from": "2026-01-01",
     },
     {
         "pattern": r"^91qh\.signed\.pdf$",
@@ -369,6 +382,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Luật Bảo vệ dữ liệu cá nhân 2025 (Luật số 91/2025/QH15)",
         "short": "Luật Bảo vệ dữ liệu cá nhân 2025",
         "type": "LAW",
+        "effective_from": "2026-01-01",
     },
     {
         "pattern": r"^93qh\.signed\.pdf$",
@@ -376,6 +390,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Luật Khoa học, Công nghệ và Đổi mới sáng tạo 2025 (Luật số 93/2025/QH15)",
         "short": "Luật KH, CN và Đổi mới sáng tạo 2025",
         "type": "LAW",
+        "effective_from": "2025-10-01",
     },
     {
         "pattern": r"^luat122\.2025\.qh15\.pdf$",
@@ -407,6 +422,7 @@ DOCUMENT_REGISTRY: list[dict[str, Any]] = [
         "title": "Bộ luật Dân sự 2015 (Luật số 91/2015/QH13)",
         "short": "Bộ luật Dân sự 2015",
         "type": "LAW",
+        "article_filter": {32, 34, 38, 117, 119, 385, 398, 400, 584, 585, 592},
     },
 ]
 
@@ -441,7 +457,7 @@ _POINT_RE = re.compile(r"(?m)^[ \t]*([a-zđ])\)[ \t]+")
 _ARTICLE_REF_RE = re.compile(r"Điều\s+(\d{1,3}[a-z]?)(?![\w])", re.IGNORECASE)
 
 _FINE_RE = re.compile(
-    r"Ph\s*ạt\s+ti\s*ền\s+t\s*ừ\s+([\d.\s]+?)\s*đồng\s+đến\s+([\d.\s]+?)\s*đồng",
+    r"Ph\s*ạt\s+ti\s*ền\s+t\s*ừ\s+([\d.,\s]+?)\s*đồng\s+đến\s+([\d.,\s]+?)\s*đồng",
     re.IGNORECASE,
 )
 _WARNING_RE = re.compile(r"Ph\s*ạt\s+c\s*ảnh\s+cáo", re.IGNORECASE)
@@ -455,6 +471,7 @@ _CONSONANT_ONLY_SPLIT = re.compile(
     rf"(?<![^\W\d_])([bcdđghklmnpqrstvxBCDĐGHKLMNPQRSTVX]{{1,3}}|[gG]i|[qQ]u) (?=[{_MARKED_VOWELS}])"
 )
 _VOWEL_E_SPLIT = re.compile(rf"(?<=[iyuoIYUO]) (?=[{_E_FAMILY}])")
+_VOWEL_U_A_SPLIT = re.compile(r"(?<=[uU]) (?=[âầấẩẫậÂẦẤẨẪẬ][tncTNC]\b)")
 
 
 def normalize_text(text: str) -> str:
@@ -464,8 +481,9 @@ def normalize_text(text: str) -> str:
     text = re.sub(r"[ \t]+", " ", text)
     text = _CONSONANT_ONLY_SPLIT.sub(r"\1", text)
     text = _VOWEL_E_SPLIT.sub("", text)
-    text = re.sub(r" +\n", "\n", text)
-    return text
+    text = _VOWEL_U_A_SPLIT.sub("", text)
+    text = re.sub(r" *\n *", "\n", text)
+    return text.strip()
 
 
 def parse_amount(raw: str) -> int | None:
@@ -533,11 +551,12 @@ class LegalDocument:
 
 
 def article_id(doc_code: str, number: int | str) -> str:
-    return f"{doc_code}:Điều {number}"
+    norm_code = unicodedata.normalize("NFC", str(doc_code or "").strip())
+    return f"{norm_code}:Điều {str(number).strip()}"
 
 
-def clause_id(doc_code: str, article_number: int | str, clause_number: int) -> str:
-    return f"{article_id(doc_code, article_number)}:Khoản {clause_number}"
+def clause_id(doc_code: str, article_number: int | str, clause_number: int | str) -> str:
+    return f"{article_id(doc_code, article_number)}:Khoản {str(clause_number).strip()}"
 
 
 REPEALED_15_ARTICLES: set[int | str] = (
@@ -553,7 +572,8 @@ def apply_effective_dates(document: LegalDocument) -> None:
         article.effective_from = article.effective_from or document.effective_from
         article.effective_to = article.effective_to or document.effective_to
         if document.code == "15/2020/NĐ-CP" and article.number in REPEALED_15_ARTICLES:
-            article.effective_to = "2026-06-30"
+            if not article.effective_to or article.effective_to > "2026-06-30":
+                article.effective_to = "2026-06-30"
 
 
 def _article_number(raw: str) -> int | str:
@@ -688,14 +708,21 @@ def _read_pdf_pages(
                         )
                         images.append(_pil_from_pixmap(pixmap))
 
-                    recognized = pool.map(
-                        lambda img: normalize_text(
-                            pytesseract.image_to_string(img, lang=ocr_lang, config=ocr_config)
-                        ),
-                        images,
-                    )
-                    for index, text in zip(page_indexes, recognized):
-                        pages[index] = text
+                    try:
+                        recognized = list(pool.map(
+                            lambda img: normalize_text(
+                                pytesseract.image_to_string(img, lang=ocr_lang, config=ocr_config)
+                            ),
+                            images,
+                        ))
+                        for index, text in zip(page_indexes, recognized):
+                            pages[index] = text
+                    finally:
+                        for img in images:
+                            try:
+                                img.close()
+                            except Exception:
+                                pass
             ocr_pages = pages
 
         try:
@@ -789,14 +816,19 @@ def _is_consolidated_source(source: str) -> bool:
     return "nội-dung-hợp-nhất" in normalized or "vbhn" in normalized
 
 
-def _sequential_matches(pattern: re.Pattern, text: str, keys: list[str]):
-    """Chỉ nhận các mốc Khoản/Điểm xuất hiện đúng thứ tự (1,2,3... hoặc a,b,c...)."""
+def _sequential_matches(pattern: re.Pattern, text: str, keys: list[str], max_skip: int = 2):
+    """Chỉ nhận các mốc Khoản/Điểm xuất hiện đúng thứ tự (phần tử đầu tiên bắt buộc khớp offset 0; sau đó cho phép nhảy số tối đa +2)."""
     accepted = []
     expected = 0
     for match in pattern.finditer(text):
-        if expected < len(keys) and match.group(1) == keys[expected]:
-            accepted.append(match)
-            expected += 1
+        val = match.group(1)
+        allowed_skip = max_skip if expected > 0 else 0
+        for offset in range(allowed_skip + 1):
+            idx = expected + offset
+            if idx < len(keys) and val == keys[idx]:
+                accepted.append(match)
+                expected = idx + 1
+                break
     return accepted
 
 
@@ -819,7 +851,7 @@ def _split_clauses(body: str, parse_fines: bool = True) -> list[Clause]:
         flat = " ".join(raw.split())
         clause = Clause(number=int(match.group(1)), text=flat, points=_split_points(raw))
         if parse_fines:
-            fine = _FINE_RE.search(flat[:400])
+            fine = _FINE_RE.search(flat[:800])
             if fine:
                 clause.fine_min = parse_amount(fine.group(1))
                 clause.fine_max = parse_amount(fine.group(2))
@@ -978,6 +1010,58 @@ def infer_issuing_body(doc_code: str, doc_type: str = "") -> str:
         return "Chính phủ"
     return "Cơ quan Nhà nước có thẩm quyền"
 
+def apply_211_amendments_to_15(target_15: LegalDocument | None, amendment_path: Path) -> int:
+    """Áp dụng 4 Điều sửa đổi, bổ sung (93a, 93b, 114, 114a) từ Nghị định 211/2025/NĐ-CP vào Nghị định 15/2020/NĐ-CP
+    và bảo toàn các phiên bản trước sửa đổi trong historical_articles."""
+    if target_15 is None or not amendment_path.is_file():
+        return 0
+    amendment_meta = identify_document_by_name(amendment_path)
+    if not amendment_meta:
+        return 0
+    try:
+        amendment_pages = _read_pages(amendment_path)
+        targets = {"93a", "93b", 114, "114a"}
+        overlay_meta = {**amendment_meta, "article_filter": targets}
+        overlays = _parse_articles(overlay_meta, amendment_path, amendment_pages, 0)
+        overlay_by_number = {article.number: article for article in overlays}
+        if targets.issubset(overlay_by_number.keys()):
+            previous_by_number = {
+                article.number: article
+                for article in target_15.articles
+                if article.number in overlay_by_number
+            }
+            amendment_effective_from = amendment_meta.get("effective_from")
+            if amendment_effective_from:
+                previous_valid_to = (
+                    date.fromisoformat(amendment_effective_from) - timedelta(days=1)
+                ).isoformat()
+                for article in previous_by_number.values():
+                    article.effective_to = previous_valid_to
+            target_15.historical_articles.extend(previous_by_number.values())
+            for _number, article in overlay_by_number.items():
+                article.doc_code = target_15.code
+                article.effective_from = amendment_meta.get("effective_from")
+                article.source_url = amendment_meta.get("source_url")
+                article.source = amendment_path.name
+            target_15.articles = [
+                article for article in target_15.articles
+                if article.number not in overlay_by_number
+            ] + list(overlay_by_number.values())
+            target_15.articles.sort(key=lambda article: _article_number_key(article.number))
+            if amendment_path.name not in target_15.sources:
+                target_15.sources.append(amendment_path.name)
+            _safe_print(
+                f"[PARSER] Đã áp dụng {len(overlays)} Điều sửa đổi từ {amendment_path.name} vào {target_15.code}"
+            )
+            return len(overlays)
+        _safe_print(
+            f"[PARSER] Không áp dụng sửa đổi NĐ 211: thiếu Điều {sorted(str(n) for n in targets - overlay_by_number.keys())}"
+        )
+    except Exception as exc:
+        _safe_print(f"[PARSER] Không đọc được sửa đổi NĐ 211 cho NĐ 15: {exc}")
+    return 0
+
+
 def load_corpus(
     data_dir: Path,
     core_only: bool = False,
@@ -1090,55 +1174,11 @@ def load_corpus(
                     if pdf.name not in document.sources:
                         document.sources.append(pdf.name)
                     _safe_print(f"[PARSER] Bỏ qua bản trùng {pdf.name} ({len(alt_articles)} Điều) -> đã có {document.code}")
-    # Overlay the provisions expressly added or replaced by Nghị định 211/2025.
-    # This keeps Nghị định 15 as the queryable legal instrument while preserving
-    # the amendment's effective date and official source for those articles.
+
     amendment_path = data_dir / "211-2025-ndcp.signed.pdf"
     target_15 = documents.get("15/2020/NĐ-CP")
     if target_15 is not None and amendment_path.is_file():
-        amendment_meta = identify_document_by_name(amendment_path)
-        if amendment_meta:
-            try:
-                amendment_pages = _read_pages(amendment_path)
-                targets = {"93a", "93b", 114, "114a"}
-                overlay_meta = {**amendment_meta, "article_filter": targets}
-                overlays = _parse_articles(overlay_meta, amendment_path, amendment_pages, 0)
-                overlay_by_number = {article.number: article for article in overlays}
-                if targets.issubset(overlay_by_number.keys()):
-                    previous_by_number = {
-                        article.number: article
-                        for article in target_15.articles
-                        if article.number in overlay_by_number
-                    }
-                    amendment_effective_from = amendment_meta.get("effective_from")
-                    if amendment_effective_from:
-                        previous_valid_to = (
-                            date.fromisoformat(amendment_effective_from) - timedelta(days=1)
-                        ).isoformat()
-                        for article in previous_by_number.values():
-                            article.effective_to = previous_valid_to
-                    target_15.historical_articles.extend(previous_by_number.values())
-                    for number, article in overlay_by_number.items():
-                        article.doc_code = target_15.code
-                        article.effective_from = amendment_meta.get("effective_from")
-                        article.source_url = amendment_meta.get("source_url")
-                        article.source = amendment_path.name
-                    target_15.articles = [
-                        article for article in target_15.articles
-                        if article.number not in overlay_by_number
-                    ] + list(overlay_by_number.values())
-                    target_15.articles.sort(key=lambda article: _article_number_key(article.number))
-                    if amendment_path.name not in target_15.sources:
-                        target_15.sources.append(amendment_path.name)
-                    _safe_print(
-                        f"[PARSER] Đã áp dụng {len(overlays)} Điều sửa đổi từ {amendment_path.name} vào {target_15.code}"
-                    )
-                else:
-                    _safe_print(
-                        f"[PARSER] Không áp dụng sửa đổi NĐ 211: thiếu Điều {sorted(str(n) for n in targets - overlay_by_number.keys())}"
-                    )
-            except Exception as exc:
-                _safe_print(f"[PARSER] Không đọc được sửa đổi NĐ 211 cho NĐ 15: {exc}")
+        apply_211_amendments_to_15(target_15, amendment_path)
 
     for document in documents.values():
         apply_effective_dates(document)

@@ -35,6 +35,10 @@ from pathlib import Path
 from typing import Any, Literal
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
+_BACKEND_DIR = Path(__file__).resolve().parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from config import DATA_DIR, NEO4J_DATABASE, create_llm, create_neo4j_driver, get_embeddings
 from legal_parser import (
     DOCUMENT_REGISTRY,
@@ -67,10 +71,10 @@ CATEGORY_LABELS = {
 }
 
 # Các Điều trọng tâm thường xuyên được truy vấn để ưu tiên nhúng Vector nhanh
-PRIORITY_ARTICLES: dict[str, set[int]] = {
-    "15/2020/NĐ-CP": {4, 15, 20, 33, 68, 77, 78, 79, 80, 81, 82, 83, 84, 94, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108},
-    "174/2026/NĐ-CP": {4, 86, 87, 88, 89, 90, 91, 93, 94, 95, 106},
-    "330/2026/NĐ-CP": {4, 25, 26, 50},
+PRIORITY_ARTICLES: dict[str, set[int | str]] = {
+    "15/2020/NĐ-CP": {4, 15, 20, 33, 68, 77, 78, 79, 80, 81, 82, 83, 84, "93a", "93b", 94, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 114, "114a"},
+    "174/2026/NĐ-CP": {4, 86, 87, 88, 89, 90, 91, 93, 94, 95, 101, 106},
+    "330/2026/NĐ-CP": {4, 7, 25, 26, 50},
     "24/2018/QH14": {8, 16, 17, 18, 19, 24, 26, 29},
     "116/2025/QH15": {7, 8, 9, 10, 18, 20, 25, 38},
     "134/2025/QH15": {4, 7, 9, 10, 11, 13, 14, 29},
@@ -303,6 +307,11 @@ SCHEMA_QUERIES = [
     f"CREATE FULLTEXT INDEX {ACTION_FULLTEXT_INDEX} IF NOT EXISTS FOR (n:Action) ON EACH [n.name, n.text]",
     f"CREATE FULLTEXT INDEX {ARTICLE_FULLTEXT_INDEX} IF NOT EXISTS FOR (n:Article) ON EACH [n.title, n.text]",
     "CREATE FULLTEXT INDEX precedent_fulltext IF NOT EXISTS FOR (n:Precedent) ON EACH [n.title, n.legal_issue, n.holding, n.reasoning]",
+    (
+        f"CREATE VECTOR INDEX {ACTION_VECTOR_INDEX} IF NOT EXISTS "
+        f"FOR (n:Action) ON (n.embedding) "
+        f"OPTIONS {{indexConfig: {{`vector.dimensions`: {DEFAULT_EMBEDDING_DIM}, `vector.similarity_function`: 'cosine'}}}}"
+    ),
 ]
 
 
@@ -649,7 +658,10 @@ def _write_skeleton(tx, document: LegalDocument, article: Article) -> dict[str, 
                 act.provision_version_id = x.version_id
             MERGE (act)-[r:DEFINED_IN]->(k) SET r.point = x.point
             SET act.source_file = $source_file, act.source_page = $source_page,
-                act.source_url = $source_url, act.provenance_status = 'LLM_CANDIDATE_LINKED_TO_SOURCE'
+                act.source_url = $source_url, act.provenance_status = 'PARSED_FROM_REGISTERED_SOURCE'
+            WITH act, x, k
+            MATCH (version:ProvisionVersion {id: x.version_id})
+            MERGE (act)-[:FROM_VERSION]->(version)
             WITH act, x, k
             OPTIONAL MATCH (point:Point {id: k.id + ':Điểm ' + x.point})
             FOREACH (_ IN CASE WHEN point IS NULL THEN [] ELSE [1] END |
@@ -783,7 +795,8 @@ def _write_llm(tx, document: LegalDocument, article: Article, extraction: Articl
             act.source = CASE WHEN act.source = 'parser' THEN 'parser+llm' ELSE coalesce(act.source, 'llm') END,
             act.text = coalesce(act.text, r.name), act.point = coalesce(act.point, r.point),
             act.llm_fine_min = r.fine_min, act.llm_fine_max = r.fine_max,
-            act.provision_version_id = r.version_id
+            act.provision_version_id = r.version_id,
+            act.provenance_status = 'LLM_CANDIDATE_LINKED_TO_SOURCE'
         WITH act, r
         MATCH (version:ProvisionVersion {id: r.version_id})
         MERGE (act)-[:FROM_VERSION]->(version)
@@ -1106,6 +1119,11 @@ def sync_graph_legal_metadata(driver) -> int:
                         WHEN a.number IN $amended_articles THEN $amendment_source_url
                         ELSE $source_url
                     END
+                WITH a
+                OPTIONAL MATCH (a)-[:HAS_VERSION]->(v:ProvisionVersion)
+                SET v.effective_from = a.effective_from,
+                    v.effective_to = a.effective_to,
+                    v.source_url = a.source_url
                 RETURN count(a) AS updated
                 """,
                 code=code,
@@ -1208,6 +1226,7 @@ def _sync_graph_amendment_links(session) -> None:
         {"old_doc": "15/2020/NĐ-CP", "old_art": 100, "new_doc": "174/2026/NĐ-CP", "new_art": 94, "effective_from": "2026-07-01"},
         {"old_doc": "15/2020/NĐ-CP", "old_art": 101, "new_doc": "174/2026/NĐ-CP", "new_art": 95, "effective_from": "2026-07-01"},
         {"old_doc": "15/2020/NĐ-CP", "old_art": 102, "new_doc": "330/2026/NĐ-CP", "new_art": 50, "effective_from": "2026-08-19"},
+        {"old_doc": "15/2020/NĐ-CP", "old_art": 106, "new_doc": "174/2026/NĐ-CP", "new_art": 101, "effective_from": "2026-07-01"},
     ]
     session.run(
         """
@@ -1241,6 +1260,19 @@ def _sync_graph_amendment_links(session) -> None:
         {"law_doc": "24/2018/QH14", "law_art": 8, "dec_doc": "15/2020/NĐ-CP", "dec_art": 102, "topic": "data_privacy"},
         {"law_doc": "24/2018/QH14", "law_art": 8, "dec_doc": "330/2026/NĐ-CP", "dec_art": 50, "topic": "data_privacy"},
         {"law_doc": "116/2025/QH15", "law_art": 8, "dec_doc": "330/2026/NĐ-CP", "dec_art": 50, "topic": "data_privacy"},
+        {"law_doc": "91/2025/QH15", "law_art": 8, "dec_doc": "330/2026/NĐ-CP", "dec_art": 50, "topic": "data_privacy"},
+        {"law_doc": "13/2023/NĐ-CP", "law_art": 3, "dec_doc": "330/2026/NĐ-CP", "dec_art": 50, "topic": "data_privacy"},
+        {"law_doc": "13/2023/NĐ-CP", "law_art": 4, "dec_doc": "330/2026/NĐ-CP", "dec_art": 50, "topic": "data_privacy"},
+
+        # Nhóm 4: Giao dịch điện tử & Chữ ký số
+        {"law_doc": "20/2023/QH15", "law_art": 6, "dec_doc": "174/2026/NĐ-CP", "dec_art": 94, "topic": "e_transactions"},
+        {"law_doc": "20/2023/QH15", "law_art": 8, "dec_doc": "174/2026/NĐ-CP", "dec_art": 107, "topic": "e_transactions"},
+        {"law_doc": "20/2023/QH15", "law_art": 22, "dec_doc": "174/2026/NĐ-CP", "dec_art": 108, "topic": "e_signatures"},
+
+        # Nhóm 5: Internet, MXH & Trí tuệ nhân tạo (AI)
+        {"law_doc": "147/2024/NĐ-CP", "law_art": 8, "dec_doc": "174/2026/NĐ-CP", "dec_art": 95, "topic": "internet_social"},
+        {"law_doc": "147/2024/NĐ-CP", "law_art": 23, "dec_doc": "174/2026/NĐ-CP", "dec_art": 94, "topic": "internet_social"},
+        {"law_doc": "134/2025/QH15", "law_art": 7, "dec_doc": "174/2026/NĐ-CP", "dec_art": 95, "topic": "ai_deepfake"},
     ]
     session.run(
         """
