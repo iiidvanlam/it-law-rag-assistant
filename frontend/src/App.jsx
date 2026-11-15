@@ -25,6 +25,61 @@ function createMessageId() {
   return `bot-${randomId || `${Date.now()}-${++fallbackMessageIdCounter}`}`;
 }
 
+const RULE_LABELS_VI = {
+  BASE_SUBJECT: 'Xác định chủ thể áp dụng gốc',
+  ORG_MULTIPLIER: 'Hệ số nhân khung phạt đối với Tổ chức',
+  INDIVIDUAL_HALVING: 'Nguyên tắc khung phạt đối với Cá nhân (bằng 1/2 Tổ chức)',
+  CAP_CHECK: 'Kiểm tra mức trần phạt tiền tối đa',
+  WARNING_PENALTY: 'Hình thức xử phạt cảnh cáo',
+  WARNING_OR_FINE: 'Hình thức xử phạt cảnh cáo hoặc phạt tiền',
+  AGE_UNDER_14: 'Nguyên tắc độ tuổi (Dưới 14 tuổi)',
+  UNDER_14_EXEMPTION: 'Nguyên tắc miễn xử phạt hành chính (Dưới 14 tuổi)',
+  AGE_14_16: 'Nguyên tắc độ tuổi (Từ đủ 14 đến dưới 16 tuổi)',
+  AGE_14_16_WARNING: 'Nguyên tắc xử lý người từ đủ 14 đến dưới 16 tuổi',
+  AGE_16_18: 'Nguyên tắc độ tuổi (Từ đủ 16 đến dưới 18 tuổi)',
+  AGE_RANGE_NEEDS_EXACT_AGE: 'Yêu cầu xác định độ tuổi chính xác của người chưa thành niên',
+  MULTI_HOP_CRIMINAL_ESCALATION: 'Chuyển hóa trách nhiệm hình sự liên đới',
+  MULTI_HOP_STATUTORY_REFERENCE: 'Dẫn chiếu quy phạm pháp luật kế thừa',
+  CURATED_STATUTORY_FALLBACK: 'Quy phạm pháp luật áp dụng',
+  STATUTE_OF_LIMITATIONS_CHECK: 'Kiểm tra thời hiệu xử phạt vi phạm hành chính',
+  HISTORICAL_VALIDITY_LOCK: 'Hiệu lực văn bản theo thời điểm áp dụng',
+  INCREMENTAL_SUPERSEDED_PROVISION: 'Quy định sửa đổi, bổ sung kế thừa',
+  PROHIBITIVE_ARTICLE_MAPPING: 'Quy phạm nghiêm cấm',
+  IRRELEVANT_QUERY_GUARDRAIL: 'Chốt chặn phạm vi tư vấn pháp luật CNTT',
+  OUT_OF_SCOPE_GUARDRAIL: 'Chốt chặn văn bản ngoài phạm vi CNTT',
+  INVALID_DOCUMENT_GUARDRAIL: 'Chốt chặn văn bản chưa có trong kho dữ liệu',
+  AMBIGUOUS_ARTICLE_GUARDRAIL: 'Yêu cầu làm rõ số hiệu văn bản quy phạm pháp luật',
+  ARTICLE_NOT_FOUND_IN_DOC_GUARDRAIL: 'Chốt chặn điều khoản không tồn tại trong văn bản',
+  INVALID_EVIDENCE_GUARDRAIL: 'Kiểm duyệt bằng chứng đầu vào',
+  ZERO_EVIDENCE_GUARDRAIL: 'Thông báo tra cứu dữ liệu pháp luật',
+};
+
+function formatRuleBadge(ruleCode) {
+  const code = String(ruleCode || '').trim();
+  if (RULE_LABELS_VI[code]) return RULE_LABELS_VI[code];
+  if (code.startsWith('CRIMINAL_STATUTORY_ARTICLE_')) return 'Căn cứ truy cứu trách nhiệm hình sự';
+  return code || 'Nguyên tắc pháp lý';
+}
+
+function cleanLegalMarkdown(rawText) {
+  if (!rawText) return '';
+  let text = String(rawText);
+  text = text.replace(/pháp lu ật/gi, 'pháp luật');
+  text = text.replace(/^(\s*-\s+Hành vi:[^\n]*?)\s+Căn cứ:\s*/gm, '$1\n  + Căn cứ: ');
+  text = text.replace(/^(\s*(?:\+\s+)?Căn cứ:[^\n]*?)\s+Hiệu lực:\s*/gm, '$1\n  + Hiệu lực: ');
+  text = text.replace(/^\s*Căn cứ:\s*/gm, '  + Căn cứ: ');
+  text = text.replace(/^\s*Hiệu lực:\s*/gm, '  + Hiệu lực: ');
+  text = text.replace(/- \[(PROVISION|VIOLATION|CRIME)\]\s*/g, (_, kind) => {
+    if (kind === 'VIOLATION') return '- Hành vi vi phạm: ';
+    if (kind === 'CRIME') return '- Tội danh hình sự: ';
+    return '- Quy định pháp luật: ';
+  });
+  text = text.replace(/- Quy tắc \[([A-Z0-9_]+)\]:/g, (_, code) => `- ${formatRuleBadge(code)}:`);
+  text = text.replace(/\s*[-—]\s*https?:\/\/\S+\)/g, ')');
+  text = text.replace(/ <= /g, ' ≤ ').replace(/ -> /g, ' → ');
+  return text;
+}
+
 const SAMPLE_QUESTIONS = [
   {
     title: 'Xử phạt theo quy định hiện hành',
@@ -180,11 +235,6 @@ function KnowledgeGraph3D({
   isLoadingGraph,
 }) {
   const canvasRef = useRef(null);
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [hoveredNode, setHoveredNode] = useState(null);
-  const [autoRotate, setAutoRotate] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-
   // Góc xoay Camera 3D & Zoom
   const cameraRef = useRef({
     rotX: 0.22,
@@ -197,6 +247,31 @@ function KnowledgeGraph3D({
     dragStartY: 0,
     moved: false,
   });
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [hoveredNode, setHoveredNode] = useState(null);
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [prevGraphMode, setPrevGraphMode] = useState(graphMode);
+
+  if (graphMode !== prevGraphMode) {
+    setPrevGraphMode(graphMode);
+    setSelectedNode(null);
+    setHoveredNode(null);
+  }
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.12 : 0.89;
+      cameraRef.current.zoom = Math.max(0.45, Math.min(2.8, cameraRef.current.zoom * factor));
+    };
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      canvas.removeEventListener('wheel', onWheel);
+    };
+  }, []);
 
   // Tạo bầu trời sao hậu cảnh (Starfield Particles) cố định
   const bgStars = useMemo(() => {
@@ -658,12 +733,6 @@ function KnowledgeGraph3D({
     }
   };
 
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const factor = e.deltaY < 0 ? 1.12 : 0.89;
-    cameraRef.current.zoom = Math.max(0.45, Math.min(2.8, cameraRef.current.zoom * factor));
-  };
-
   const resetCamera = () => {
     cameraRef.current = {
       ...cameraRef.current,
@@ -769,7 +838,6 @@ function KnowledgeGraph3D({
             cameraRef.current.isDragging = false;
             setHoveredNode(null);
           }}
-          onWheel={handleWheel}
         />
 
         {/* Overlay trạng thái đang tải */}
@@ -1055,22 +1123,61 @@ function buildLocalFallbackSimulation(primary, subject, ageGroup) {
   const baseMin = Number(primary?.base_min) || 0;
   const baseMax = Number(primary?.base_max) || 0;
   const docCode = primary?.doc_code || '15/2020/NĐ-CP';
-  const isIndividualBase = Number(primary?.article_number) === 106;
+  const artNum = Number(primary?.article_number) || 0;
+  const isIndividualOnly =
+    (docCode === '15/2020/NĐ-CP' && artNum === 106) ||
+    (docCode === '174/2026/NĐ-CP' && artNum === 101);
+  const isDecree330IndBase = docCode === '330/2026/NĐ-CP' && artNum >= 9 && artNum <= 49;
   const fmt = (n) => `${Math.round(n).toLocaleString('vi-VN')} đồng`;
 
   if (subject === 'ORGANIZATION') {
-    const orgMin = isIndividualBase ? baseMin * 2 : baseMin;
-    const orgMax = isIndividualBase ? baseMax * 2 : baseMax;
+    if (isIndividualOnly) {
+      return {
+        display: 'Không áp dụng cho tổ chức',
+        formula: `Điều ${artNum} chỉ điều chỉnh hành vi của cá nhân (người chơi)`,
+        basis: `Khoản 3 Điều 4 Nghị định ${docCode}`,
+        effective_to: primary?.effective_to || null,
+      };
+    }
+    if (isDecree330IndBase) {
+      const orgMin = Math.min(baseMin * 2, 200_000_000);
+      const orgMax = Math.min(baseMax * 2, 200_000_000);
+      return {
+        display: `${fmt(orgMin)} – ${fmt(orgMax)}`,
+        formula: 'Tổ chức = 2 × mức phạt Cá nhân (trần 200 triệu đồng)',
+        basis: 'Điều 7 Nghị định 330/2026/NĐ-CP',
+        effective_to: primary?.effective_to || null,
+      };
+    }
     return {
-      display: `${fmt(orgMin)} – ${fmt(orgMax)}`,
-      formula: isIndividualBase ? 'Nhân 2 lần mức phạt cá nhân (Điều 106)' : '100% khung chuẩn Tổ chức',
+      display: `${fmt(baseMin)} – ${fmt(baseMax)}`,
+      formula: '100% khung chuẩn Tổ chức',
       basis: `Khoản 3 Điều 4 Nghị định ${docCode}`,
       effective_to: primary?.effective_to || null,
     };
   }
 
-  const indMin = isIndividualBase ? baseMin : baseMin / 2;
-  const indMax = isIndividualBase ? baseMax : baseMax / 2;
+  // CÁ NHÂN (INDIVIDUAL)
+  let indMin = baseMin;
+  let indMax = baseMax;
+  let formulaBase = '100% khung cá nhân';
+
+  if (!isIndividualOnly && !isDecree330IndBase) {
+    indMin = baseMin / 2;
+    indMax = baseMax / 2;
+    formulaBase = '1/2 khung phạt của Tổ chức';
+  }
+
+  // Trần lĩnh vực cho cá nhân (đồng bộ 1:1 với DECREE_RULES.individual_caps ở backend/legal_rules.py)
+  const INDIVIDUAL_40M_RANGES = {
+    '15/2020/NĐ-CP': [[5, 14], [107, 112]],
+    '174/2026/NĐ-CP': [[5, 14], [106, 112]],
+    '330/2026/NĐ-CP': [],
+  };
+  const ranges40m = INDIVIDUAL_40M_RANGES[docCode] || [];
+  const cap = ranges40m.some(([low, high]) => artNum >= low && artNum <= high) ? 40_000_000 : 100_000_000;
+  indMax = Math.min(indMax, cap);
+  indMin = Math.min(indMin, cap);
 
   if (ageGroup === 'UNDER_14') {
     return {
@@ -1099,8 +1206,8 @@ function buildLocalFallbackSimulation(primary, subject, ageGroup) {
 
   return {
     display: `${fmt(indMin)} – ${fmt(indMax)}`,
-    formula: isIndividualBase ? '100% khung cá nhân (Điều 106)' : '1/2 khung phạt của Tổ chức',
-    basis: `Khoản 3 Điều 4 Nghị định ${docCode}`,
+    formula: formulaBase,
+    basis: docCode === '330/2026/NĐ-CP' ? 'Điều 7 Nghị định 330/2026/NĐ-CP' : `Khoản 3 Điều 4 Nghị định ${docCode}`,
     effective_to: primary?.effective_to || null,
   };
 }
@@ -1226,6 +1333,16 @@ function WhatIfSandbox({ penaltyCalcs = [] }) {
 // ============================================================================
 // VŨ KHÍ 4: XUẤT PHIẾU TƯ VẤN PHÁP LÝ / ĐƠN TRÌNH BÁO AN NINH MẠNG (PRINT/PDF)
 // ============================================================================
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function exportLegalAdvisoryReport(questionText, botMsg) {
   const sym = botMsg?.symbolicData;
   const calcs = sym?.reasoning?.penalty_calculations || [];
@@ -1236,23 +1353,23 @@ function exportLegalAdvisoryReport(questionText, botMsg) {
     .map(
       (c) => `
       <div style="border:1px solid #cbd5e1;border-radius:8px;padding:12px;margin-bottom:10px;background:#f8fafc;">
-        <div style="font-weight:700;color:#0f172a;margin-bottom:4px;">Hành vi: ${c.action}</div>
-        <div style="font-size:12px;color:#2563eb;font-weight:600;margin-bottom:8px;">Căn cứ: ${c.clause}, ${c.article}</div>
+        <div style="font-weight:700;color:#0f172a;margin-bottom:4px;">Hành vi: ${escapeHtml(c.action)}</div>
+        <div style="font-size:12px;color:#2563eb;font-weight:600;margin-bottom:8px;">Căn cứ: ${escapeHtml(c.clause)}, ${escapeHtml(c.article)}</div>
         ${(c.calculations || [])
           .map(
             (r) =>
-              `<div style="font-size:13px;margin:3px 0;">• <b>${r.subject_label}:</b> <span style="color:#dc2626;font-weight:700;">${r.display}</span> <i>(${r.formula})</i></div>`
+              `<div style="font-size:13px;margin:3px 0;">• <b>${escapeHtml(r.subject_label)}:</b> <span style="color:#dc2626;font-weight:700;">${escapeHtml(r.display)}</span> <i>(${escapeHtml(r.formula)})</i></div>`
           )
           .join('')}
         ${
           c.sanctions?.length
-            ? `<div style="font-size:12.5px;margin-top:6px;color:#475569;"><b>Biện pháp khắc phục hậu quả:</b> ${c.sanctions.join('; ')}</div>`
+            ? `<div style="font-size:12.5px;margin-top:6px;color:#475569;"><b>Biện pháp khắc phục hậu quả:</b> ${escapeHtml(c.sanctions.join('; '))}</div>`
             : ''
         }
         ${
           c.criminal_escalations?.length
             ? `<div style="font-size:12.5px;margin-top:6px;color:#991b1b;background:#fef2f2;padding:6px 8px;border-radius:6px;"><b>⚖️ Cảnh báo Chuyển hóa Hình sự (Multi-Hop):</b> ${c.criminal_escalations
-                .map((ce) => `${ce.title} — ${ce.penalty}`)
+                .map((ce) => `${escapeHtml(ce.title)} — ${escapeHtml(ce.penalty)}`)
                 .join(' | ')}</div>`
             : ''
         }
@@ -1261,10 +1378,14 @@ function exportLegalAdvisoryReport(questionText, botMsg) {
     .join('');
 
   const sourcesHtml = sources
-    .map(
-      (s) =>
-        `<li style="margin-bottom:6px;"><b>${s.title}</b> — ${s.article} (Trang ${s.page}): <i>"${s.snippet}"</i></li>`
-    )
+    .map((s) => {
+      const pageStr = s.page != null ? ` (Trang ${escapeHtml(s.page)})` : '';
+      const safeUrl = s.source_url && /^https?:\/\//i.test(s.source_url) ? s.source_url : null;
+      const linkHtml = safeUrl
+        ? ` — <a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;">Xem văn bản gốc</a>`
+        : '';
+      return `<li style="margin-bottom:6px;"><b>${escapeHtml(s.title)}</b> — ${escapeHtml(s.article)}${pageStr}: <i>"${escapeHtml(s.snippet)}"</i>${linkHtml}</li>`;
+    })
     .join('');
 
   const html = `<!DOCTYPE html>
@@ -1303,10 +1424,10 @@ function exportLegalAdvisoryReport(questionText, botMsg) {
     </tr>
   </table>
   <div class="report-title">PHIẾU TƯ VẤN PHÁP LUẬT CÔNG NGHỆ THÔNG TIN & AN NINH MẠNG</div>
-  <div class="report-sub">Thời điểm trích xuất: ${nowStr} • Mã kiểm chứng: Symbolic-Rule-Engine-v2.2</div>
+  <div class="report-sub">Thời điểm trích xuất: ${escapeHtml(nowStr)} • Mã kiểm chứng: Symbolic-Rule-Engine-v2.2</div>
 
   <div class="section-title">I. NỘI DUNG TÌNH HUỐNG / YÊU CẦU TƯ VẤN</div>
-  <div class="box">${(questionText || 'Tư vấn pháp luật CNTT').replace(/</g, '&lt;')}</div>
+  <div class="box">${escapeHtml(questionText || 'Tư vấn pháp luật CNTT')}</div>
 
   ${
     calcRowsHtml
@@ -1315,7 +1436,7 @@ function exportLegalAdvisoryReport(questionText, botMsg) {
   }
 
   <div class="section-title">III. Ý KIẾN TƯ VẤN PHÁP LÝ CHI TIẾT</div>
-  <div class="box">${(botMsg?.text || '').replace(/</g, '&lt;')}</div>
+  <div class="box">${escapeHtml(botMsg?.text || '')}</div>
 
   ${
     sourcesHtml
@@ -1540,7 +1661,14 @@ function App() {
       const saved = localStorage.getItem('lexit_conversations_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((c) => ({
+            ...c,
+            messages: Array.isArray(c.messages)
+              ? c.messages.map((m) => (m && m.streaming ? { ...m, streaming: false } : m))
+              : [],
+          }));
+        }
       }
     } catch {
       // ignore
@@ -1805,8 +1933,12 @@ function App() {
     const targetConvId = activeConvId;
 
     const historyPayload = messages
+      .filter((m) => !m.streaming && m.text && !String(m.text).startsWith('⚠️'))
       .slice(-4)
-      .map((m) => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
+      .map((m) => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        text: String(m.text || '').slice(0, 1800),
+      }));
 
     const userMessage = { id: createMessageId(), role: 'user', text: displayUserText };
     const updatedTitle =
@@ -1855,7 +1987,21 @@ function App() {
       });
 
       if (!res.ok || !res.body) {
-        throw new Error(`HTTP ${res.status}`);
+        let detailMsg = '';
+        try {
+          const errPayload = await res.json();
+          if (typeof errPayload?.detail === 'string') {
+            detailMsg = errPayload.detail;
+          } else if (Array.isArray(errPayload?.detail)) {
+            detailMsg = errPayload.detail.map((d) => d.msg || JSON.stringify(d)).join('; ');
+          }
+        } catch {
+          // ignore non-JSON error body
+        }
+        const httpErr = new Error(detailMsg || `HTTP ${res.status}`);
+        httpErr.status = res.status;
+        httpErr.detail = detailMsg;
+        throw httpErr;
       }
 
       const reader = res.body.getReader();
@@ -1943,25 +2089,139 @@ function App() {
           }
         }
       }
+
+      if (buffer.trim()) {
+        try {
+          const evt = JSON.parse(buffer.trim());
+          if (evt.type === 'token') {
+            accumulatedText += evt.content || '';
+            const snapshot = accumulatedText;
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === targetConvId
+                  ? {
+                      ...c,
+                      messages: c.messages.map((m) =>
+                        m.id === botMsgId ? { ...m, text: snapshot } : m
+                      ),
+                    }
+                  : c
+              )
+            );
+          } else if (evt.type === 'done') {
+            const finalText = evt.answer || accumulatedText;
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === targetConvId
+                  ? {
+                      ...c,
+                      updatedAt: Date.now(),
+                      messages: c.messages.map((m) =>
+                        m.id === botMsgId
+                          ? {
+                              ...m,
+                              text: finalText,
+                              naiveText: evt.naive_answer,
+                              streaming: false,
+                            }
+                          : m
+                      ),
+                    }
+                  : c
+              )
+            );
+          }
+        } catch {
+          // ignore trailing incomplete JSON
+        }
+      }
     } catch (error) {
       if (error?.name === 'AbortError') return;
       console.error('Lỗi gọi API:', error);
-      const errText =
-        '⚠️ **Không thể kết nối tới máy chủ Backend (`http://127.0.0.1:8000`).**\n\nHãy đảm bảo bạn đã chạy lệnh `python main.py` trong thư mục `backend/` và container Docker (`law_neo4j`, `law_postgres_graph`) đang hoạt động.';
+      let recovered = false;
+      if (error?.status !== 401 && error?.status !== 413 && error?.status !== 429) {
+        try {
+          const fallbackRes = await fetch(`${API_BASE_URL}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...API_HEADERS },
+            signal: controller.signal,
+            body: JSON.stringify({
+              question: textToSend,
+              as_of_date: asOfDateToSend,
+              comparison_mode: isComparisonMode,
+              history: historyPayload,
+            }),
+          });
+          if (fallbackRes.ok) {
+            const data = await fallbackRes.json();
+            const latestSymbolic = {
+              reasoning: data.symbolic_reasoning,
+              graph: data.graph_view,
+              sources: data.sources,
+            };
+            setCurrentSymbolicData(latestSymbolic);
+            setShowSymbolicPanel(true);
+            if (data.graph_view?.nodes?.length > 0) {
+              setGraphMode('query');
+            }
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === targetConvId
+                  ? {
+                      ...c,
+                      updatedAt: Date.now(),
+                      messages: c.messages.map((m) =>
+                        m.id === botMsgId
+                          ? {
+                              ...m,
+                              text: data.answer || '',
+                              naiveText: data.naive_answer,
+                              symbolicData: latestSymbolic,
+                              streaming: false,
+                            }
+                          : m
+                      ),
+                    }
+                  : c
+              )
+            );
+            recovered = true;
+          }
+        } catch {
+          // fallback also failed
+        }
+      }
+      if (!recovered) {
+        const errText = error?.status
+          ? `⚠️ **Yêu cầu không thành công (HTTP ${error.status}):** ${error.detail || 'Máy chủ từ chối yêu cầu hoặc quá tải tạm thời. Vui lòng thử lại.'}`
+          : '⚠️ **Không thể kết nối tới máy chủ Backend (`http://127.0.0.1:8000`).**\n\nHãy đảm bảo bạn đã chạy lệnh `python main.py` trong thư mục `backend/` và container Docker (`law_neo4j`, `law_postgres_graph`) đang hoạt động.';
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === targetConvId
+              ? {
+                  ...c,
+                  messages: c.messages.map((m) =>
+                    m.id === botMsgId ? { ...m, text: errText, streaming: false } : m
+                  ),
+                }
+              : c
+          )
+        );
+      }
+    } finally {
+      setIsLoading(false);
       setConversations((prev) =>
         prev.map((c) =>
           c.id === targetConvId
             ? {
                 ...c,
                 messages: c.messages.map((m) =>
-                  m.id === botMsgId ? { ...m, text: errText, streaming: false } : m
+                  m.id === botMsgId && m.streaming ? { ...m, streaming: false } : m
                 ),
               }
             : c
         )
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -2337,7 +2597,7 @@ function App() {
                               <span className="warning-chip">Dễ nhầm chủ thể/mức phạt</span>
                             </div>
                             <div className="card-body markdown-prose">
-                              <ReactMarkdown>{msg.naiveText}</ReactMarkdown>
+                              <ReactMarkdown>{cleanLegalMarkdown(msg.naiveText)}</ReactMarkdown>
                             </div>
                           </div>
 
@@ -2347,13 +2607,13 @@ function App() {
                               <span className="success-chip">Chính xác theo Rule Engine</span>
                             </div>
                             <div className="card-body markdown-prose">
-                              <ReactMarkdown>{msg.text}</ReactMarkdown>
+                              <ReactMarkdown>{cleanLegalMarkdown(msg.text)}</ReactMarkdown>
                             </div>
                           </div>
                         </div>
                       ) : (
                         <div className="markdown-prose">
-                          <ReactMarkdown>{msg.text}</ReactMarkdown>
+                          <ReactMarkdown>{cleanLegalMarkdown(msg.text)}</ReactMarkdown>
                         </div>
                       )}
 
@@ -2433,9 +2693,6 @@ function App() {
 
         {/* Ô nhập câu hỏi nổi ở đáy phong cách ChatGPT */}
         <div className="chatgpt-composer-zone">
-          <div className="legal-disclaimer">
-            Thông tin tra cứu tự động có thể thiếu hoặc chưa cập nhật; nội dung này không thay thế tư vấn pháp lý chuyên môn.
-          </div>
           <input
             ref={evidenceInputRef}
             type="file"
@@ -2561,6 +2818,9 @@ function App() {
               </button>
             </div>
           </form>
+          <div className="legal-disclaimer">
+            Thông tin tra cứu tự động có thể thiếu hoặc chưa cập nhật; nội dung này không thay thế tư vấn pháp lý chuyên môn.
+          </div>
         </div>
       </main>
 
@@ -2857,7 +3117,7 @@ function App() {
                       <div className="steps-timeline">
                         {activeSymbolic.reasoning.rule_steps.map((step, idx) => (
                           <div key={idx} className="step-item">
-                            <div className="step-badge">{step.rule}</div>
+                            <div className="step-badge">{formatRuleBadge(step.rule)}</div>
                             <div className="step-detail">{step.detail}</div>
                             <div className="step-basis">Căn cứ: {step.basis}</div>
                           </div>
