@@ -123,7 +123,9 @@ class LegalParserMetadataTests(unittest.TestCase):
         # 3. HNSW ef_search = 100, statement_timeout, and halfvec distance reuse
         self.assertIn("SET LOCAL hnsw.ef_search = 100", main_src)
         self.assertIn("SET LOCAL statement_timeout = '3500ms'", main_src)
-        self.assertIn("ORDER BY nearest.dist ASC", main_src)
+        # Stage 2 re-rank on full-precision embeddings (halfvec HNSW only shortlists candidates)
+        self.assertIn("ORDER BY (e.embedding <=> CAST(:query_vector AS vector)) ASC, nearest.dist ASC", main_src)
+        self.assertIn(".data()", main_src.split("def _run_cypher", 1)[1].split("\n", 3)[2])
         # 4. Neo4j Multi-Hop timeout and memory cap
         self.assertIn("Neo4jQuery(cypher_text, timeout=timeout_s)", main_src)
         self.assertIn("left(coalesce(version.text, provision.text, ''), 700)", main_src)
