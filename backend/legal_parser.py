@@ -634,6 +634,29 @@ def _ocr_cache_path(path: Path) -> Path:
     return cache_dir / f"ocr.{content_hash}.json"
 
 
+def _legacy_ocr_cache_path(path: Path, cache_dir: Path) -> Path | None:
+    """Fallback an toàn sang bộ nhớ đệm OCR cũ (<pdf.name>.<hash12>.json) nếu chưa có ocr.<hash16>.json."""
+    try:
+        stat = path.stat()
+        legacy_hash = hashlib.sha1(f"{path.name}:{stat.st_size}:{int(stat.st_mtime)}".encode("utf-8")).hexdigest()[:12]
+        exact_legacy = cache_dir / f"{path.name}.{legacy_hash}.json"
+        if exact_legacy.exists():
+            return exact_legacy
+    except Exception:
+        pass
+    try:
+        matches = sorted(
+            (p for p in cache_dir.glob(f"{path.name}.*.json") if p.is_file()),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        if matches:
+            return matches[0]
+    except Exception:
+        pass
+    return None
+
+
 def _pil_from_pixmap(pixmap) -> Any:
     """Chuyển đổi PyMuPDF Pixmap sang PIL Image an toàn cho mọi không gian màu (Grayscale/RGB/CMYK)."""
     if pixmap.n == 1:
@@ -672,9 +695,12 @@ def _read_pdf_pages(
 
     # Kiểm tra bộ nhớ đệm OCR trên đĩa trước khi chạy Tesseract
     cache_file = _ocr_cache_path(pdf) if use_cache else None
-    if cache_file is not None and cache_file.exists():
+    cache_candidate = cache_file if (cache_file is not None and cache_file.exists()) else None
+    if cache_candidate is None and cache_file is not None:
+        cache_candidate = _legacy_ocr_cache_path(pdf, cache_file.parent)
+    if cache_candidate is not None and cache_candidate.exists():
         try:
-            cached_pages = json.loads(cache_file.read_text(encoding="utf-8"))
+            cached_pages = json.loads(cache_candidate.read_text(encoding="utf-8"))
             if isinstance(cached_pages, list) and cached_pages:
                 return [_HEADER_RE.sub("", normalize_text(p)) for p in cached_pages]
         except Exception:

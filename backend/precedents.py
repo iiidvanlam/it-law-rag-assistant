@@ -112,7 +112,10 @@ def _write_precedent(tx, record: PrecedentRecord, source_file: str) -> int:
         reasoning=record.reasoning,
         tags=record.tags,
         source_file=source_file,
-        reference_specs=[reference.model_dump(mode="json") for reference in record.references],
+        reference_specs=json.dumps(
+            [reference.model_dump(mode="json") for reference in record.references],
+            ensure_ascii=False,
+        ),
     ).consume()
 
     resolved = 0
@@ -131,7 +134,8 @@ def _write_precedent(tx, record: PrecedentRecord, source_file: str) -> int:
         result = tx.run(
             f"""
             MATCH (p:Precedent {{id: $id}})
-            MATCH (a:Article {{doc_code: $doc_code, number: $article_number}})
+            MATCH (a:Article {{doc_code: $doc_code}})
+            WHERE toLower(toString(a.number)) = toLower(toString($article_number))
             MERGE (p)-[r:{relation_type} {{id: $reference_id}}]->(a)
             SET r.clause_number = $clause_number, r.point = $point,
                 r.supporting_quote = $supporting_quote, r.source_url = $source_url

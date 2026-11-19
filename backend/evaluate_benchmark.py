@@ -1046,13 +1046,4 @@ async def run_benchmark():
 if __name__ == "__main__":
     if "FAST_BENCHMARK" not in os.environ and not os.getenv("BENCHMARK_USE_ONLINE_LLM"):
         os.environ["FAST_BENCHMARK"] = "1"
-    if os.environ.get("FAST_BENCHMARK") == "1":
-        _coro = run_benchmark()
-        try:
-            _coro.send(None)
-        except StopIteration:
-            pass
-        else:
-            asyncio.run(_coro)
-    else:
-        asyncio.run(run_benchmark())
+    asyncio.run(run_benchmark())

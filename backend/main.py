@@ -34,7 +34,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from neo4j import Query as Neo4jQuery
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import create_engine, text as sql_text
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
@@ -139,12 +139,45 @@ _ALLOWED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+from fastapi import Header
+from workspace_tools import (
+    AuthManager,
+    ContactInquiryStore,
+    ConversationStore,
+    DRAFT_TEMPLATES_CATALOG,
+    OtpCooldownError,
+    extract_document_text_from_base64,
+    generate_legal_draft,
+    generate_suggested_followups,
+    get_article_detail_with_history,
+    get_platform_stats,
+    list_legal_updates,
+    match_precedents_for_articles,
+    review_it_compliance_document,
+    search_legal_documents,
+    search_precedents_catalog,
+)
+
 _RATE_LIMITS = {
     "/chat": (30, 60),
     "/chat/stream": (30, 60),
     "/analyze-evidence": (5, 60),
     "/benchmark/run": (1, 60),
     "/penalty/simulate": (60, 60),
+    "/auth/register": (20, 60),
+    "/auth/otp/request": (10, 60),
+    "/auth/register/verify-otp": (15, 60),
+    "/auth/password/reset": (10, 60),
+    "/auth/change-password": (15, 60),
+    "/auth/login": (30, 60),
+    "/auth/google": (30, 60),
+    "/compliance/review": (15, 60),
+    "/drafting/generate": (20, 60),
+    "/precedents/search": (60, 60),
+    "/legal/article-detail": (60, 60),
+    "/legal/documents/search": (60, 60),
+    "/legal/updates": (60, 60),
+    "/support/contact": (10, 60),
 }
 _rate_hits: dict[tuple[str, str], deque[float]] = defaultdict(deque)
 _rate_lock = threading.Lock()
@@ -155,7 +188,7 @@ app.add_middleware(
     allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=False,
     allow_methods=["*"],
-    allow_headers=["Authorization", "Content-Type", "X-API-Key"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-User-Token"],
 )
 
 
@@ -475,6 +508,7 @@ def fast_pg_hybrid_search(
                               AND e.cmetadata->>'doc_code' = ANY(CAST(:docs AS text[]))
                               AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                               AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                              AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                             LIMIT :lim
                             """
                         ),
@@ -493,6 +527,7 @@ def fast_pg_hybrid_search(
                               AND LOWER(e.cmetadata->>'article_number') = ANY(CAST(:arts AS text[]))
                               AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                               AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                              AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                             LIMIT :lim
                             """
                         ),
@@ -514,6 +549,7 @@ def fast_pg_hybrid_search(
                               AND e.cmetadata->>'doc_code' = '211/2025/NĐ-CP'
                               AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                               AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                              AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                               AND e.document ILIKE '%Điều 3%'
                             ORDER BY e.cmetadata->>'clauses'
                             LIMIT 2
@@ -556,6 +592,7 @@ def fast_pg_hybrid_search(
                                   )
                                   AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                                   AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                                  AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                                 ORDER BY dist ASC
                                 LIMIT :candidate_limit
                             )
@@ -628,6 +665,7 @@ def fast_pg_hybrid_search(
                                   AND e.cmetadata->>'doc_code' = ANY(CAST(:docs AS text[]))
                                   AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                                   AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                                  AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                                 LIMIT 24
                                 """
                             ),
@@ -650,6 +688,7 @@ def fast_pg_hybrid_search(
                                   AND e.document ILIKE ANY(CAST(:pats AS text[]))
                                   AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                                   AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                                  AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                                 LIMIT 24
                                 """
                             ),
@@ -691,6 +730,7 @@ def fast_pg_hybrid_search(
                                   )
                                   AND (e.cmetadata->>'effective_from' IS NULL OR e.cmetadata->>'effective_from' <= :as_of)
                                   AND (e.cmetadata->>'effective_to' IS NULL OR e.cmetadata->>'effective_to' >= :as_of)
+                                  AND UPPER(COALESCE(e.cmetadata->>'lifecycle_status', 'ACTIVE')) NOT IN ('PREPARED', 'FAILED', 'RETIRED')
                                 LIMIT 24
                                 """
                             ),
@@ -2724,6 +2764,31 @@ def query_knowledge_graph(
                         "external": False,
                     })
 
+    if not matched_precedents:
+        pair_candidates: list[tuple[str, str]] = []
+        for pv in provision_versions:
+            if pv.get("doc_code") and pv.get("article_number"):
+                pair_candidates.append((str(pv["doc_code"]), str(pv["article_number"])))
+        for act in matched_actions:
+            if act.get("doc_code") and act.get("article_number"):
+                pair_candidates.append((str(act["doc_code"]), str(act["article_number"])))
+        if pair_candidates:
+            for prec in match_precedents_for_articles(pair_candidates, limit=3):
+                matched_precedents.append(prec)
+                add_node(
+                    f"precedent:{prec['id']}",
+                    str(prec.get("title") or prec["id"])[:70],
+                    "Precedent",
+                    {
+                        "decision_number": prec.get("decision_number"),
+                        "decision_date": prec.get("decision_date"),
+                        "status": prec.get("status") or "UNKNOWN",
+                        "legal_issue": prec.get("legal_issue"),
+                        "holding": (prec.get("holding") or "")[:600],
+                        "source_url": prec.get("source_url"),
+                    },
+                )
+
     return {
         "matched_actions": matched_actions,
         "penalty_calculations": penalty_calcs,
@@ -2803,9 +2868,193 @@ prompt_naive = PromptTemplate(
 
 
 # ---------------------------------------------------------------------------
-# API Endpoints
+# API Response Schemas & Endpoints
 # ---------------------------------------------------------------------------
-@app.get("/health")
+class _FlexibleResponseModel(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+
+class HealthResponse(_FlexibleResponseModel):
+    status: str
+    neo4j_connected: bool
+    pgvector_ready: bool
+
+
+class PenaltySimulationResponse(_FlexibleResponseModel):
+    subject: str
+    subject_label: str
+    applicable: bool
+    min_amount: int | None = None
+    max_amount: int | None = None
+    display: str
+    formula: str
+    basis: str
+    rule_steps: list[dict[str, Any]]
+    doc_code: str
+    article_number: int | str
+    effective_from: str | None = None
+    effective_to: str | None = None
+
+
+class GraphOverviewResponse(_FlexibleResponseModel):
+    stats: dict[str, Any]
+    documents: list[dict[str, Any]]
+    graph_view: dict[str, Any]
+    status: str | None = None
+
+
+class ChatResponse(_FlexibleResponseModel):
+    answer: str
+    naive_answer: str | None = None
+    symbolic_reasoning: dict[str, Any]
+    graph_view: dict[str, Any]
+    sources: list[dict[str, Any]]
+    effective_as_of: str | None = None
+    evidence_state: str = "NO_EVIDENCE"
+    suggested_followups: list[str] = Field(default_factory=list)
+
+
+class EvidenceAnalysisResponse(_FlexibleResponseModel):
+    filename: str
+    char_count: int
+    word_count: int
+    extracted_text: str
+    is_valid_evidence: bool
+    rejection_reason: str | None = None
+    facts: dict[str, Any]
+
+
+class BenchmarkRunResponse(_FlexibleResponseModel):
+    total_cases: int
+    mode: str
+    metrics: list[dict[str, Any]]
+    cases: list[dict[str, Any]]
+    evaluation_note: str | None = None
+
+
+class AuthTokenResponse(_FlexibleResponseModel):
+    user: dict[str, Any]
+    access_token: str
+    token_type: str = "bearer"
+
+
+class AuthOtpResponse(_FlexibleResponseModel):
+    ok: bool = True
+    email: str
+    purpose: str
+    expires_in_seconds: int
+    resend_after_seconds: int
+    delivery_channel: str
+    message: str
+
+
+class AuthPasswordResetResponse(_FlexibleResponseModel):
+    ok: bool = True
+    email: str
+    message: str
+
+
+class LegalDocumentsSearchResponse(_FlexibleResponseModel):
+    total: int
+    evaluated_as_of: str
+    items: list[dict[str, Any]]
+
+
+class LegalUpdatesResponse(_FlexibleResponseModel):
+    total: int
+    evaluated_as_of: str
+    items: list[dict[str, Any]]
+
+
+class PlatformStatsResponse(_FlexibleResponseModel):
+    total_documents: int
+    total_vectors: int
+    total_precedents: int
+    benchmark_cases: int
+    guardrail_layers: int
+
+
+class ConversationListResponse(_FlexibleResponseModel):
+    items: list[dict[str, Any]]
+
+
+class ConversationItemResponse(_FlexibleResponseModel):
+    conversation: dict[str, Any]
+
+
+class ConversationDeleteResponse(_FlexibleResponseModel):
+    ok: bool = True
+    deleted: bool
+
+
+class ContactInquiryResponse(_FlexibleResponseModel):
+    ok: bool = True
+    id: str
+    created_at: str
+    message: str
+
+
+class GoogleConfigResponse(_FlexibleResponseModel):
+    enabled: bool
+    client_id: str
+
+
+class AuthUserResponse(_FlexibleResponseModel):
+    user: dict[str, Any]
+
+
+class PrecedentSearchResponse(_FlexibleResponseModel):
+    total: int
+    items: list[dict[str, Any]]
+
+
+class ArticleDetailResponse(_FlexibleResponseModel):
+    found: bool
+    doc_code: str
+    doc_title: str
+    article_number: str
+    article_title: str
+    full_text: str
+    page: int | None = None
+    effective_from: str | None = None
+    effective_to: str | None = None
+    evaluated_as_of: str
+    status_badge: str
+    status_label: str
+    source_url: str | None = None
+    related_documents: list[str]
+    transition: dict[str, Any] | None = None
+    precedents: list[dict[str, Any]]
+
+
+class ComplianceReviewResponse(_FlexibleResponseModel):
+    doc_type: str
+    subject: str
+    evaluated_as_of: str
+    compliance_score: int
+    risk_level: str
+    counts: dict[str, int]
+    summary: str
+    llm_advisory: str | None = None
+    findings: list[dict[str, Any]]
+
+
+class DraftTemplatesResponse(_FlexibleResponseModel):
+    templates: list[dict[str, Any]]
+
+
+class LegalDraftResponse(_FlexibleResponseModel):
+    template_type: str
+    title: str
+    evaluated_as_of: str
+    language: str
+    draft_markdown: str
+    cited_statutes: list[str]
+    llm_refined: bool = False
+    used_llm: bool | None = None
+
+
+@app.get("/health", response_model=HealthResponse)
 def health_check():
     neo4j_ok = False
     if (
@@ -2828,7 +3077,7 @@ def health_check():
     }
 
 
-@app.post("/penalty/simulate")
+@app.post("/penalty/simulate", response_model=PenaltySimulationResponse)
 def simulate_penalty_endpoint(request: PenaltySimulationRequest):
     """Run an interactive What-If calculation using server-owned legal rules and graph fines."""
     action_id = request.action_id.strip()
@@ -2995,7 +3244,7 @@ def _append_overview_row_to_graph(
         graph.add_edge(cl_id, a_id, "PART_OF")
 
 
-@app.get("/graph/overview")
+@app.get("/graph/overview", response_model=GraphOverviewResponse)
 def graph_overview(doc_code: str | None = None, limit: int = Query(default=110, ge=1, le=300)):
     """Trả về thống kê toàn cục của Neo4j và mạng lưới Đồ thị 3D trực tiếp từ cơ sở dữ liệu Neo4j."""
     limit_int = int(limit if isinstance(limit, int) else getattr(limit, "default", 110) or 110)
@@ -4348,7 +4597,7 @@ def _synthesize_deterministic_naive_answer(bundle: dict[str, Any]) -> str:
     return "Không tìm thấy đủ căn cứ trong đoạn trích vector."
 
 
-@app.post("/chat")
+@app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     return await _execute_chat(request)
 
@@ -4394,60 +4643,58 @@ async def _execute_chat(request: ChatRequest, *, force_live_llm: bool = False) -
                 )
             except Exception as e:
                 early["naive_answer"] = f"(Lỗi Naive RAG Baseline: {e})"
+        early.setdefault(
+            "suggested_followups",
+            generate_suggested_followups(
+                request.question, early.get("symbolic_reasoning"), early.get("sources")
+            ),
+        )
         return early
 
-    used_llm_fallback = False
-
-    def _call_hybrid() -> str:
-        nonlocal used_llm_fallback
+    def _call_hybrid() -> tuple[str, bool]:
         if not force_live_llm and (llm is None or os.getenv("FAST_BENCHMARK", "0") == "1" or os.getenv("LLM_OFFLINE", "0") == "1"):
-            used_llm_fallback = True
-            return _synthesize_deterministic_hybrid_answer(bundle)
+            return _synthesize_deterministic_hybrid_answer(bundle), True
         if llm is None:
-            used_llm_fallback = True
-            return _synthesize_deterministic_hybrid_answer(bundle)
+            return _synthesize_deterministic_hybrid_answer(bundle), True
         try:
             res = llm.invoke(bundle["hybrid_prompt_text"])
             content = res.content if hasattr(res, "content") else str(res)
             if content and content.strip():
-                return content
+                return content, False
         except Exception as e:
             print(f"[THÔNG BÁO LLM Hybrid Fallback sang Symbolic Synthesis]: {e}")
-        used_llm_fallback = True
-        return _synthesize_deterministic_hybrid_answer(bundle)
+        return _synthesize_deterministic_hybrid_answer(bundle), True
 
-    def _call_naive() -> str | None:
-        nonlocal used_llm_fallback
+    def _call_naive() -> tuple[str | None, bool]:
         if not request.comparison_mode:
-            return None
+            return None, False
         if not force_live_llm and (llm is None or os.getenv("FAST_BENCHMARK", "0") == "1" or os.getenv("LLM_OFFLINE", "0") == "1"):
-            used_llm_fallback = True
-            return _synthesize_deterministic_naive_answer(bundle)
+            return _synthesize_deterministic_naive_answer(bundle), True
         if llm is None:
-            used_llm_fallback = True
-            return _synthesize_deterministic_naive_answer(bundle)
+            return _synthesize_deterministic_naive_answer(bundle), True
         try:
             res = llm.invoke(bundle["naive_prompt_text"])
             content = res.content if hasattr(res, "content") else str(res)
             if content and content.strip():
-                return content
+                return content, False
         except Exception:
             pass
-        used_llm_fallback = True
-        return _synthesize_deterministic_naive_answer(bundle)
+        return _synthesize_deterministic_naive_answer(bundle), True
 
     # Chạy song song 2 luồng LLM nếu bật comparison_mode để giảm 50% thời gian chờ
     if fast_sync:
-        hybrid_answer = _call_hybrid()
-        naive_answer = _call_naive() if request.comparison_mode else None
+        hybrid_answer, hybrid_used_fallback = _call_hybrid()
+        naive_answer, naive_used_fallback = _call_naive() if request.comparison_mode else (None, False)
     elif request.comparison_mode:
-        hybrid_answer, naive_answer = await asyncio.gather(
+        (hybrid_answer, hybrid_used_fallback), (naive_answer, naive_used_fallback) = await asyncio.gather(
             asyncio.to_thread(_call_hybrid),
             asyncio.to_thread(_call_naive),
         )
     else:
-        hybrid_answer = await asyncio.to_thread(_call_hybrid)
-        naive_answer = None
+        hybrid_answer, hybrid_used_fallback = await asyncio.to_thread(_call_hybrid)
+        naive_answer, naive_used_fallback = None, False
+
+    used_llm_fallback = hybrid_used_fallback or naive_used_fallback
 
     raw_hybrid = hybrid_answer
     hybrid_answer = _verify_and_guard_llm_output(hybrid_answer, bundle)
@@ -4462,6 +4709,9 @@ async def _execute_chat(request: ChatRequest, *, force_live_llm: bool = False) -
         "sources": bundle["sources"],
         "effective_as_of": bundle["effective_as_of"],
         "evidence_state": bundle["evidence_state"],
+        "suggested_followups": generate_suggested_followups(
+            request.question, bundle["symbolic_reasoning"], bundle["sources"]
+        ),
     }
     is_valid_answer = (
         bool(hybrid_answer)
@@ -4489,6 +4739,9 @@ async def chat_stream_endpoint(request: ChatRequest):
     cached_res = _response_cache_get(_CHAT_CACHE, cache_key, 600.0) if not request.history else None
     if cached_res is not None:
         async def _cached_gen():
+            followups = cached_res.get("suggested_followups") or generate_suggested_followups(
+                request.question, cached_res.get("symbolic_reasoning"), cached_res.get("sources")
+            )
             yield json.dumps({
                 "type": "meta",
                 "symbolic_reasoning": cached_res["symbolic_reasoning"],
@@ -4496,11 +4749,13 @@ async def chat_stream_endpoint(request: ChatRequest):
                 "sources": cached_res["sources"],
                 "effective_as_of": cached_res.get("effective_as_of"),
                 "evidence_state": cached_res.get("evidence_state", "NO_EVIDENCE"),
+                "suggested_followups": followups,
             }, ensure_ascii=False) + "\n"
             yield json.dumps({
                 "type": "done",
                 "answer": cached_res["answer"],
                 "naive_answer": cached_res.get("naive_answer"),
+                "suggested_followups": followups,
             }, ensure_ascii=False) + "\n"
         return StreamingResponse(_cached_gen(), media_type="application/x-ndjson")
 
@@ -4511,6 +4766,9 @@ async def chat_stream_endpoint(request: ChatRequest):
         try:
             if bundle["early_response"] is not None:
                 early = bundle["early_response"]
+                early_followups = early.get("suggested_followups") or generate_suggested_followups(
+                    request.question, early.get("symbolic_reasoning"), early.get("sources")
+                )
                 yield json.dumps({
                     "type": "meta",
                     "symbolic_reasoning": early["symbolic_reasoning"],
@@ -4518,6 +4776,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                     "sources": early["sources"],
                     "effective_as_of": early.get("effective_as_of") or (request.as_of_date.isoformat() if request.as_of_date else date.today().isoformat()),
                     "evidence_state": early.get("evidence_state", "NO_EVIDENCE"),
+                    "suggested_followups": early_followups,
                 }, ensure_ascii=False) + "\n"
                 naive_ans = early.get("naive_answer")
                 if request.comparison_mode and naive_ans is None:
@@ -4529,9 +4788,13 @@ async def chat_stream_endpoint(request: ChatRequest):
                     "type": "done",
                     "answer": early["answer"],
                     "naive_answer": naive_ans,
+                    "suggested_followups": early_followups,
                 }, ensure_ascii=False) + "\n"
                 return
 
+            stream_followups = generate_suggested_followups(
+                request.question, bundle["symbolic_reasoning"], bundle["sources"]
+            )
             # Bước 1: Gửi NGAY LẬP TỨC (< 0.2s) Đồ thị Neo4j 3D + Dấu vết Logic + Nguồn trích dẫn cho Frontend!
             yield json.dumps({
                 "type": "meta",
@@ -4540,25 +4803,23 @@ async def chat_stream_endpoint(request: ChatRequest):
                 "sources": bundle["sources"],
                 "effective_as_of": bundle["effective_as_of"],
                 "evidence_state": bundle["evidence_state"],
+                "suggested_followups": stream_followups,
             }, ensure_ascii=False) + "\n"
 
             used_llm_fallback = False
             # Nếu bật chế độ So sánh A/B, khởi chạy Naive RAG ở luồng nền song song trong lúc stream Hybrid RAG
             if request.comparison_mode:
-                def _run_naive_sync():
-                    nonlocal used_llm_fallback
+                def _run_naive_sync() -> tuple[str, bool]:
                     if llm is None or os.getenv("FAST_BENCHMARK", "0") == "1" or os.getenv("LLM_OFFLINE", "0") == "1":
-                        used_llm_fallback = True
-                        return _synthesize_deterministic_naive_answer(bundle)
+                        return _synthesize_deterministic_naive_answer(bundle), True
                     try:
                         r = llm.invoke(bundle["naive_prompt_text"])
                         content = r.content if hasattr(r, "content") else str(r)
                         if content and content.strip():
-                            return content
+                            return content, False
                     except Exception:
                         pass
-                    used_llm_fallback = True
-                    return _synthesize_deterministic_naive_answer(bundle)
+                    return _synthesize_deterministic_naive_answer(bundle), True
                 naive_future = asyncio.create_task(asyncio.to_thread(_run_naive_sync))
 
             # Bước 2: Stream từng cụm từ (token) từ mô hình ngôn ngữ ra giao diện theo thời gian thực
@@ -4593,7 +4854,11 @@ async def chat_stream_endpoint(request: ChatRequest):
             final_answer = _verify_and_guard_llm_output(final_answer, bundle)
             if final_answer != raw_final:
                 used_llm_fallback = True
-            naive_answer = await naive_future if naive_future is not None else None
+            if naive_future is not None:
+                naive_answer, naive_used_fallback = await naive_future
+                used_llm_fallback = used_llm_fallback or naive_used_fallback
+            else:
+                naive_answer = None
 
             is_valid_answer = (
                 bool(final_answer)
@@ -4612,6 +4877,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                         "sources": bundle["sources"],
                         "effective_as_of": bundle["effective_as_of"],
                         "evidence_state": bundle["evidence_state"],
+                        "suggested_followups": stream_followups,
                     },
                     _CHAT_CACHE_LIMIT,
                 )
@@ -4620,6 +4886,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                 "type": "done",
                 "answer": final_answer,
                 "naive_answer": naive_answer,
+                "suggested_followups": stream_followups,
             }, ensure_ascii=False) + "\n"
         finally:
             if naive_future is not None and not naive_future.done():
@@ -4656,7 +4923,7 @@ class EvidenceRequest(BaseModel):
     content_base64: str = Field(min_length=1, max_length=MAX_EVIDENCE_B64_CHARS)
 
 
-@app.post("/analyze-evidence")
+@app.post("/analyze-evidence", response_model=EvidenceAnalysisResponse)
 async def analyze_evidence_endpoint(req: EvidenceRequest):
     """Nhận file ảnh chụp màn hình (.png, .jpg, .webp) hoặc tài liệu (.pdf, .docx, .txt),
     bóc tách văn bản bằng OCR / PyMuPDF và phân tích sơ bộ dấu hiệu pháp lý."""
@@ -4751,7 +5018,7 @@ def _get_live_benchmark_lock() -> asyncio.Lock:
     return _LIVE_BENCHMARK_LOCK
 
 
-@app.get("/benchmark/run")
+@app.get("/benchmark/run", response_model=BenchmarkRunResponse)
 async def run_benchmark_api(live: bool = False):
     """Trả về bảng kết quả thực nghiệm đối chứng 40 kịch bản (tức thì hoặc chạy Live LLM)."""
     global _BENCHMARK_CACHE
@@ -4940,6 +5207,454 @@ async def run_benchmark_api(live: bool = False):
         "cases": rows,
     }
     return summary
+
+
+_AUTH_MANAGER: AuthManager | None = None
+
+
+def _get_auth_manager() -> AuthManager:
+    global _AUTH_MANAGER
+    if _AUTH_MANAGER is None:
+        _AUTH_MANAGER = AuthManager(sql_engine=_sql_engine)
+    return _AUTH_MANAGER
+
+
+class AuthRegisterRequest(BaseModel):
+    email: str = Field(..., min_length=4, max_length=160)
+    password: str = Field(..., min_length=6, max_length=128)
+    full_name: str = Field(..., min_length=2, max_length=120)
+    role: str = Field(default="Doanh nghiệp / Cá nhân", max_length=100)
+    organization: str = Field(default="", max_length=160)
+
+
+class AuthOtpRequest(BaseModel):
+    email: str = Field(..., min_length=4, max_length=160)
+    purpose: str = Field(default="register", max_length=32)
+
+
+class AuthRegisterVerifyOtpRequest(BaseModel):
+    email: str = Field(..., min_length=4, max_length=160)
+    otp_code: str = Field(..., min_length=6, max_length=12)
+    password: str = Field(..., min_length=6, max_length=128)
+    full_name: str = Field(..., min_length=2, max_length=120)
+    role: str = Field(default="Doanh nghiệp / Cá nhân", max_length=100)
+    organization: str = Field(default="", max_length=160)
+
+
+class AuthPasswordResetRequest(BaseModel):
+    email: str = Field(..., min_length=4, max_length=160)
+    otp_code: str = Field(..., min_length=6, max_length=12)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
+
+class AuthLoginRequest(BaseModel):
+    email: str = Field(..., min_length=4, max_length=160)
+    password: str = Field(..., min_length=1, max_length=128)
+
+
+class AuthChangePasswordRequest(BaseModel):
+    current_password: str = Field(default="", max_length=128)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
+
+class GoogleTokenLoginRequest(BaseModel):
+    credential: str = Field(..., min_length=20, max_length=8192)
+
+
+class ConversationUpsertRequest(BaseModel):
+    id: str = Field(..., min_length=2, max_length=80)
+    title: str = Field(default="Cuộc trò chuyện mới", max_length=160)
+    pinned: bool = Field(default=False)
+    messages: list[dict[str, Any]] = Field(default_factory=list)
+    updatedAt: int | None = Field(default=None)
+
+
+class ContactInquiryRequest(BaseModel):
+    full_name: str = Field(..., min_length=2, max_length=120)
+    email: str = Field(..., min_length=4, max_length=160)
+    phone: str = Field(default="", max_length=32)
+    organization: str = Field(default="", max_length=160)
+    topic: str = Field(default="Hỗ trợ pháp lý CNTT", max_length=100)
+    message: str = Field(..., min_length=10, max_length=4000)
+
+
+class AuthProfileUpdateRequest(BaseModel):
+    full_name: str | None = Field(default=None, max_length=120)
+    role: str | None = Field(default=None, max_length=100)
+    organization: str | None = Field(default=None, max_length=160)
+    preferences: dict[str, Any] | None = Field(default=None)
+
+
+class ComplianceReviewRequest(BaseModel):
+    document_text: str | None = Field(default=None, max_length=200_000)
+    file_base64: str | None = Field(default=None, max_length=MAX_EVIDENCE_B64_CHARS)
+    filename: str | None = Field(default="policy.txt", max_length=255)
+    doc_type: str = Field(default="PRIVACY_POLICY", max_length=64)
+    subject: str = Field(default="ORGANIZATION", max_length=32)
+    as_of_date: str | None = Field(default=None, max_length=32)
+    use_llm: bool = Field(default=False)
+
+
+class LegalDraftRequest(BaseModel):
+    template_type: str = Field(..., max_length=64)
+    party_a: str = Field(default="", max_length=200)
+    party_b: str = Field(default="", max_length=200)
+    incident_or_scope: str = Field(default="", max_length=4000)
+    as_of_date: str | None = Field(default=None, max_length=32)
+    language: str = Field(default="vi", max_length=10)
+    use_llm: bool = Field(default=False)
+
+
+def _require_user(x_user_token: str | None) -> dict[str, Any]:
+    if not x_user_token:
+        raise HTTPException(status_code=401, detail="Vui lòng đăng nhập (thiếu X-User-Token).")
+    user = _get_auth_manager().verify_access_token(x_user_token)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Phiên đăng nhập không hợp lệ hoặc đã hết hạn.")
+    return user
+
+
+@app.post("/auth/register", response_model=AuthTokenResponse)
+def auth_register(request: AuthRegisterRequest):
+    try:
+        user, token = _get_auth_manager().register_user(
+            request.email,
+            request.password,
+            request.full_name,
+            request.role,
+            request.organization,
+        )
+        return {"user": user, "access_token": token, "token_type": "bearer"}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/auth/otp/request", response_model=AuthOtpResponse)
+def auth_request_otp(request: AuthOtpRequest):
+    try:
+        return _get_auth_manager().request_otp(
+            request.email,
+            request.purpose,
+        )
+    except OtpCooldownError as exc:
+        raise HTTPException(
+            status_code=429,
+            detail=str(exc),
+            headers={"Retry-After": str(exc.retry_after_seconds)},
+        ) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/auth/register/verify-otp", response_model=AuthTokenResponse)
+def auth_register_verify_otp(request: AuthRegisterVerifyOtpRequest):
+    try:
+        user, token = _get_auth_manager().register_with_otp(
+            request.email,
+            request.otp_code,
+            request.password,
+            request.full_name,
+            request.role,
+            request.organization,
+        )
+        return {"user": user, "access_token": token, "token_type": "bearer"}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/auth/password/reset", response_model=AuthPasswordResetResponse)
+def auth_password_reset(request: AuthPasswordResetRequest):
+    try:
+        return _get_auth_manager().reset_password_with_otp(
+            request.email,
+            request.otp_code,
+            request.new_password,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/auth/login", response_model=AuthTokenResponse)
+def auth_login(request: AuthLoginRequest):
+    try:
+        user, token = _get_auth_manager().login_user(
+            request.email,
+            request.password,
+        )
+        return {"user": user, "access_token": token, "token_type": "bearer"}
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+
+
+@app.get("/auth/google-config", response_model=GoogleConfigResponse)
+def auth_google_config():
+    client_id = (os.getenv("GOOGLE_CLIENT_ID") or "").strip()
+    return {"enabled": bool(client_id), "client_id": client_id}
+
+
+@app.post("/auth/google", response_model=AuthTokenResponse)
+def auth_google(request: GoogleTokenLoginRequest):
+    try:
+        user, token = _get_auth_manager().login_with_google_token(request.credential)
+        return {"user": user, "access_token": token, "token_type": "bearer"}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+
+
+@app.put("/auth/change-password", response_model=AuthPasswordResetResponse)
+def auth_change_password(
+    request: AuthChangePasswordRequest,
+    x_user_token: str | None = Header(default=None, alias="X-User-Token"),
+):
+    current = _require_user(x_user_token)
+    try:
+        return _get_auth_manager().change_password(
+            current["id"],
+            request.current_password,
+            request.new_password,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/auth/me", response_model=AuthUserResponse)
+def auth_me(x_user_token: str | None = Header(default=None, alias="X-User-Token")):
+    user = _require_user(x_user_token)
+    return {"user": user}
+
+
+@app.put("/auth/profile", response_model=AuthUserResponse)
+def auth_update_profile(
+    request: AuthProfileUpdateRequest,
+    x_user_token: str | None = Header(default=None, alias="X-User-Token"),
+):
+    current = _require_user(x_user_token)
+    updated = _get_auth_manager().update_profile(
+        current["id"],
+        request.full_name,
+        request.role,
+        request.organization,
+        request.preferences,
+    )
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Không tìm thấy hồ sơ người dùng.")
+    return {"user": updated}
+
+
+@app.get("/precedents/search", response_model=PrecedentSearchResponse)
+def search_precedents_endpoint(
+    q: str = "",
+    doc_code: str = "",
+    article_number: str = "",
+    tag: str = "",
+    limit: int = Query(default=20, ge=1, le=50),
+):
+    limit_int = int(limit if isinstance(limit, int) else getattr(limit, "default", 20) or 20)
+    items = search_precedents_catalog(
+        query=q,
+        doc_code=doc_code,
+        article_number=article_number,
+        tag=tag,
+        limit=limit_int,
+    )
+    return {"total": len(items), "items": items}
+
+
+@app.get("/legal/article-detail", response_model=ArticleDetailResponse)
+def legal_article_detail_endpoint(
+    doc_code: str,
+    article_number: str,
+    as_of_date: str | None = None,
+):
+    if not doc_code.strip() or not article_number.strip():
+        raise HTTPException(status_code=400, detail="Thiếu doc_code hoặc article_number.")
+    try:
+        return get_article_detail_with_history(
+            doc_code=doc_code,
+            article_number=article_number,
+            sql_engine=_sql_engine,
+            neo4j_driver=neo4j_driver,
+            as_of=as_of_date,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/compliance/review", response_model=ComplianceReviewResponse)
+def compliance_review_endpoint(request: ComplianceReviewRequest):
+    raw_text = (request.document_text or "").strip()
+    if not raw_text and request.file_base64:
+        try:
+            raw_text = extract_document_text_from_base64(
+                request.filename or "policy.txt",
+                request.file_base64,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"Không thể trích xuất văn bản từ tệp: {exc}") from exc
+
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="Vui lòng nhập nội dung hoặc đính kèm tệp (.pdf/.docx/.txt) để rà soát.")
+
+    try:
+        return review_it_compliance_document(
+            document_text=raw_text,
+            doc_type=request.doc_type,
+            subject=request.subject,
+            as_of=request.as_of_date,
+            neo4j_driver=neo4j_driver,
+            llm=llm,
+            use_llm=request.use_llm,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/drafting/templates", response_model=DraftTemplatesResponse)
+def drafting_templates_endpoint():
+    return {
+        "templates": [
+            {"id": key, **meta}
+            for key, meta in DRAFT_TEMPLATES_CATALOG.items()
+        ]
+    }
+
+
+@app.post("/drafting/generate", response_model=LegalDraftResponse)
+def drafting_generate_endpoint(request: LegalDraftRequest):
+    try:
+        return generate_legal_draft(
+            template_type=request.template_type,
+            party_a=request.party_a,
+            party_b=request.party_b,
+            incident_or_scope=request.incident_or_scope,
+            as_of=request.as_of_date,
+            language=request.language,
+            llm=llm,
+            use_llm=request.use_llm,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+_CONVERSATION_STORE: ConversationStore | None = None
+_INQUIRY_STORE: ContactInquiryStore | None = None
+
+
+def _get_conversation_store() -> ConversationStore:
+    global _CONVERSATION_STORE
+    if _CONVERSATION_STORE is None:
+        _CONVERSATION_STORE = ConversationStore(sql_engine=_sql_engine)
+    return _CONVERSATION_STORE
+
+
+def _get_inquiry_store() -> ContactInquiryStore:
+    global _INQUIRY_STORE
+    if _INQUIRY_STORE is None:
+        _INQUIRY_STORE = ContactInquiryStore(sql_engine=_sql_engine)
+    return _INQUIRY_STORE
+
+
+@app.get("/legal/documents/search", response_model=LegalDocumentsSearchResponse)
+def legal_documents_search_endpoint(
+    q: str = "",
+    doc_type: str = "",
+    issuing_body: str = "",
+    effective_from: str | None = None,
+    effective_to: str | None = None,
+    status: str = "",
+    as_of_date: str | None = None,
+    limit: int = Query(default=30, ge=1, le=60),
+):
+    limit_int = int(limit if isinstance(limit, int) else getattr(limit, "default", 30) or 30)
+    try:
+        return search_legal_documents(
+            query=q,
+            doc_type=doc_type,
+            issuing_body=issuing_body,
+            effective_from=effective_from,
+            effective_to=effective_to,
+            status=status,
+            as_of=as_of_date,
+            limit=limit_int,
+            sql_engine=_sql_engine,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/legal/updates", response_model=LegalUpdatesResponse)
+def legal_updates_endpoint(
+    as_of_date: str | None = None,
+    limit: int = Query(default=24, ge=1, le=50),
+):
+    limit_int = int(limit if isinstance(limit, int) else getattr(limit, "default", 24) or 24)
+    try:
+        return list_legal_updates(as_of=as_of_date, limit=limit_int)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/stats/overview", response_model=PlatformStatsResponse)
+def platform_stats_endpoint():
+    return get_platform_stats(sql_engine=_sql_engine)
+
+
+@app.get("/conversations", response_model=ConversationListResponse)
+def list_conversations_endpoint(
+    limit: int = Query(default=50, ge=1, le=100),
+    x_user_token: str | None = Header(default=None, alias="X-User-Token"),
+):
+    current = _require_user(x_user_token)
+    limit_int = int(limit if isinstance(limit, int) else getattr(limit, "default", 50) or 50)
+    items = _get_conversation_store().list_conversations(current["id"], limit=limit_int)
+    return {"items": items}
+
+
+@app.put("/conversations/{conv_id}", response_model=ConversationItemResponse)
+def upsert_conversation_endpoint(
+    conv_id: str,
+    request: ConversationUpsertRequest,
+    x_user_token: str | None = Header(default=None, alias="X-User-Token"),
+):
+    current = _require_user(x_user_token)
+    payload = request.model_dump()
+    payload["id"] = conv_id
+    try:
+        saved = _get_conversation_store().upsert_conversation(current["id"], payload)
+        return {"conversation": saved}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.delete("/conversations/{conv_id}", response_model=ConversationDeleteResponse)
+def delete_conversation_endpoint(
+    conv_id: str,
+    x_user_token: str | None = Header(default=None, alias="X-User-Token"),
+):
+    current = _require_user(x_user_token)
+    deleted = _get_conversation_store().delete_conversation(current["id"], conv_id)
+    return {"ok": True, "deleted": deleted}
+
+
+@app.post("/support/contact", response_model=ContactInquiryResponse)
+def submit_contact_inquiry_endpoint(request: ContactInquiryRequest):
+    try:
+        return _get_inquiry_store().submit_inquiry(
+            full_name=request.full_name,
+            email=request.email,
+            message=request.message,
+            phone=request.phone,
+            organization=request.organization,
+            topic=request.topic,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 if __name__ == "__main__":

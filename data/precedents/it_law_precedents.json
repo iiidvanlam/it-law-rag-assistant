@@ -1,0 +1,329 @@
+{
+  "precedents": [
+    {
+      "id": "PREC-285-2023-HCM",
+      "title": "Hồ sơ thực hành xét xử mẫu về sản xuất, mua bán phần mềm theo dõi thiết bị di động trái phép (Điều 285 BLHS)",
+      "court": "Tòa án nhân dân cấp sơ thẩm (Tổng hợp thực tiễn xét xử tội phạm mạng)",
+      "decision_number": "TL-285/2023/HS-ST",
+      "decision_date": "2023-08-18",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-285-2023-hcm",
+      "material_facts": "Bị cáo thiết kế và rao bán phần mềm cài đặt ngầm trên điện thoại thông minh nhằm thu thập nhật ký cuộc gọi, tin nhắn SMS và tọa độ định vị của người dùng mà không có sự đồng ý, thu lợi bất chính hơn 320 triệu đồng trên nhiều tỉnh, thành phố.",
+      "legal_issue": "Xác định cấu thành tội sản xuất, mua bán, trao đổi hoặc tặng cho công cụ, thiết bị, phần mềm để sử dụng vào mục đích trái pháp luật theo Điều 285 Bộ luật Hình sự.",
+      "holding": "Phần mềm có tính năng ẩn giao diện và tự động trích xuất dữ liệu cá nhân trái phép từ thiết bị đầu cuối được xác định là 'phần mềm có tính năng tấn công, xâm nhập mạng máy tính' theo Điều 285 BLHS; hành vi phát triển để bán thương mại đủ căn cứ truy cứu trách nhiệm hình sự mà không phụ thuộc việc phần mềm có được gọi là 'phần mềm quản lý nhân sự' hay không.",
+      "reasoning": "Hội đồng xét xử đối chiếu chức năng kỹ thuật thực tế của mã nguồn thay cho tên gọi thương mại do bị cáo đặt. Khi công cụ vượt qua cơ chế kiểm soát quyền truy cập, thu thập lén lút dữ liệu và được bán thu lợi từ 50 triệu đồng trở lên hoặc hướng tới nhiều bị hại, hành vi thỏa mãn dấu hiệu định tội tại Điều 285 BLHS và hành vi bị nghiêm cấm theo Điều 7 Luật An toàn thông tin mạng.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "285",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Người nào sản xuất, mua bán, trao đổi hoặc tặng cho công cụ, thiết bị, phần mềm có tính năng tấn công mạng máy tính, mạng viễn thông, phương tiện điện tử để sử dụng vào mục đích trái pháp luật thì bị phạt tiền hoặc phạt tù."
+        },
+        {
+          "doc_code": "86/2015/QH13",
+          "article_number": "7",
+          "clause_number": 5,
+          "relation": "CITES",
+          "supporting_quote": "Nghiêm cấm hành vi phát tán thư rác, phần mềm độc hại, thiết lập hệ thống thông tin giả mạo, lừa đảo."
+        },
+        {
+          "doc_code": "24/2018/QH14",
+          "article_number": "8",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Nghiêm cấm sử dụng không gian mạng để thực hiện hành vi tấn công mạng, khủng bố mạng, gián điệp mạng, tội phạm mạng."
+        }
+      ],
+      "tags": ["BLHS Điều 285", "phần mềm gián điệp", "spyware", "tội phạm mạng"]
+    },
+    {
+      "id": "PREC-286-2022-HN",
+      "title": "Hồ sơ thực hành xét xử mẫu về phát tán mã độc tống tiền (Ransomware) qua thư điện tử giả mạo (Điều 286 BLHS)",
+      "court": "Tòa án nhân dân thành phố (Tổng hợp thực tiễn xét xử án hình sự công nghệ cao)",
+      "decision_number": "TL-286/2022/HS-PT",
+      "decision_date": "2022-11-25",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-286-2022-hn",
+      "material_facts": "Đối tượng gửi hàng loạt thư điện tử đính kèm tệp giả mạo hóa đơn điện tử chứa mã độc mã hóa dữ liệu đến máy chủ kế toán của 14 doanh nghiệp, làm tê liệt hệ thống kế toán trong nhiều ngày và yêu cầu thanh toán tiền ảo để giải mã.",
+      "legal_issue": "Đánh giá dấu hiệu 'cản trở hoặc gây rối loạn hoạt động của mạng máy tính' trong hành vi phát tán ransomware theo Điều 286 BLHS.",
+      "holding": "Hành vi phát tán chương trình tin học gây mã hóa tệp dữ liệu và làm ngưng trệ hoạt động bình thường của hệ thống mạng nội bộ doanh nghiệp từ 30 phút trở lên hoặc gây thiệt hại từ 50 triệu đồng trở lên cấu thành tội phạm theo Điều 286 BLHS, độc lập với việc bị hại có chuyển tiền chuộc hay không.",
+      "reasoning": "Việc mã hóa dữ liệu khiến hệ điều hành và phần mềm nghiệp vụ không thể truy xuất được là biểu hiện trực tiếp của hậu quả gây rối loạn hoạt động mạng máy tính. Giám định tư pháp xác định chuỗi hàm băm mã độc khớp với tệp phát tán từ máy chủ điều khiển của bị cáo.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "286",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Người nào cố ý phát tán chương trình tin học gây hại cho hoạt động của mạng máy tính, mạng viễn thông, phương tiện điện tử gây rối loạn hoạt động hoặc gây thiệt hại thì bị truy cứu trách nhiệm hình sự."
+        },
+        {
+          "doc_code": "86/2015/QH13",
+          "article_number": "7",
+          "clause_number": 5,
+          "relation": "CITES",
+          "supporting_quote": "Nghiêm cấm hành vi phát tán phần mềm độc hại và xâm nhập trái phép hệ thống thông tin."
+        }
+      ],
+      "tags": ["BLHS Điều 286", "ransomware", "mã độc", "tấn công hệ thống"]
+    },
+    {
+      "id": "PREC-287-2024-DN",
+      "title": "Hồ sơ thực hành xét xử mẫu về thuê mạng botnet tấn công từ chối dịch vụ DDoS cổng thông tin (Điều 287 BLHS)",
+      "court": "Tòa án nhân dân (Tổng hợp thực tiễn xét xử an toàn thông tin mạng)",
+      "decision_number": "TL-287/2024/HS-ST",
+      "decision_date": "2024-05-14",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-287-2024-dn",
+      "material_facts": "Do mâu thuẫn cạnh tranh kinh doanh, bị cáo thuê dịch vụ tấn công DDoS với lưu lượng lớn liên tục trong 48 giờ vào máy chủ cổng giao dịch thương mại điện tử của đối thủ, làm gián đoạn hoàn toàn việc tiếp nhận đơn hàng trực tuyến.",
+      "legal_issue": "Phân định ranh giới xử phạt vi phạm hành chính theo Nghị định 15/2020/NĐ-CP Điều 80 với truy cứu trách nhiệm hình sự theo Điều 287 BLHS đối với hành vi tấn công DDoS.",
+      "holding": "Khi hành vi cản trở hoặc gây rối loạn hoạt động mạng kéo dài gây thiệt hại vật chất từ 50 triệu đồng trở lên hoặc làm gián đoạn hệ thống thông tin quy mô lớn từ 1.000 người dùng trở lên, vụ việc phải chuyển xử lý hình sự theo Điều 287 BLHS thay vì chỉ xử phạt hành chính theo Điều 80 Nghị định 15/2020/NĐ-CP.",
+      "reasoning": "Lưu lượng log hệ thống tường lửa và kết luận định giá thiệt hại doanh thu trong thời gian gián đoạn là căn cứ định lượng chuyển từ vi phạm hành chính sang trách nhiệm hình sự; bên thuê và bên vận hành hạ tầng tấn công cùng phải chịu trách nhiệm tương ứng vai trò đồng phạm.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "287",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Người nào tự ý xóa, làm tổn hại hoặc thay đổi phần mềm, dữ liệu điện tử hoặc ngăn chặn trái phép việc truyền tải dữ liệu gây cản trở, rối loạn hoạt động mạng máy tính bị xử lý theo Điều 287 Bộ luật Hình sự."
+        },
+        {
+          "doc_code": "24/2018/QH14",
+          "article_number": "18",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Phòng, chống tấn công mạng và bảo vệ an ninh đối với hệ thống thông tin quan trọng."
+        },
+        {
+          "doc_code": "15/2020/NĐ-CP",
+          "article_number": "80",
+          "clause_number": 2,
+          "relation": "INTERPRETS",
+          "supporting_quote": "Hành vi cản trở trái pháp luật hoặc gây rối loạn hoạt động hệ thống thông tin ở mức chưa đến mức truy cứu trách nhiệm hình sự bị xử phạt vi phạm hành chính."
+        }
+      ],
+      "tags": ["BLHS Điều 287", "DDoS", "botnet", "Nghị định 15/2020 Điều 80"]
+    },
+    {
+      "id": "PREC-288-2023-HN",
+      "title": "Hồ sơ thực hành xét xử mẫu về mua bán trái phép dữ liệu cá nhân khách hàng trên mạng (Điều 288 BLHS & Điều 84 NĐ 15/2020)",
+      "court": "Tòa án nhân dân thành phố (Tổng hợp thực tiễn xét xử bảo vệ dữ liệu cá nhân)",
+      "decision_number": "TL-288/2023/HS-PT",
+      "decision_date": "2023-10-12",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-288-2023-hn",
+      "material_facts": "Nhân viên bộ phận chăm sóc khách hàng lợi dụng quyền truy cập CRM nội bộ để kết xuất 120.000 hồ sơ họ tên, số CCCD, số điện thoại và số dư tài khoản của khách hàng rồi rao bán qua nhóm nhắn tin mã hóa để thu lợi bất chính.",
+      "legal_issue": "Áp dụng đồng thời nghĩa vụ bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP, Luật 91/2025/QH15 và trách nhiệm hình sự theo Điều 288 BLHS khi đưa trái phép thông tin trên mạng.",
+      "holding": "Dữ liệu cá nhân của khách hàng trong cơ sở dữ liệu nội bộ doanh nghiệp là thông tin thuộc phạm vi bảo vệ; hành vi kết xuất hàng loạt ngoài phạm vi công vụ để mua bán, chuyển nhượng trái phép thu lợi từ 50 triệu đồng trở lên hoặc gây thiệt hại nghiêm trọng cấu thành tội đưa hoặc sử dụng trái phép thông tin mạng máy tính theo Điều 288 BLHS.",
+      "reasoning": "Quyền truy cập phục vụ công vụ không đồng nghĩa với quyền sao chép, lưu giữ cá nhân hoặc chuyển giao cho bên thứ ba. Ngoài trách nhiệm hình sự đối với cá nhân vi phạm, doanh nghiệp quản lý hệ thống có nghĩa vụ triển khai kiểm soát kỹ thuật theo Nghị định 13/2023/NĐ-CP, Luật Bảo vệ dữ liệu cá nhân 91/2025/QH15 và Nghị định 330/2026/NĐ-CP.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "288",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Hành vi mua bán, trao đổi, tặng cho, sửa chữa, thay đổi hoặc công khai hóa thông tin riêng hợp pháp của cơ quan, tổ chức, cá nhân trên mạng máy tính, mạng viễn thông mà không được phép của chủ sở hữu thông tin đó."
+        },
+        {
+          "doc_code": "15/2020/NĐ-CP",
+          "article_number": "84",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Thu thập, sử dụng, phát tán, kinh doanh trái pháp luật thông tin cá nhân của người khác."
+        },
+        {
+          "doc_code": "13/2023/NĐ-CP",
+          "article_number": "3",
+          "clause_number": 1,
+          "relation": "INTERPRETS",
+          "supporting_quote": "Dữ liệu cá nhân được bảo vệ theo quy định của pháp luật và không được mua, bán dưới mọi hình thức."
+        },
+        {
+          "doc_code": "91/2025/QH15",
+          "article_number": "8",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Nghiêm cấm mua, bán dữ liệu cá nhân, trừ trường hợp luật có quy định khác."
+        },
+        {
+          "doc_code": "330/2026/NĐ-CP",
+          "article_number": "50",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Xử phạt vi phạm hành chính đối với hành vi mua, bán dữ liệu cá nhân và chuyển dữ liệu cá nhân trái quy định."
+        }
+      ],
+      "tags": ["BLHS Điều 288", "dữ liệu cá nhân", "mua bán data", "NĐ 13/2023", "Luật 91/2025"]
+    },
+    {
+      "id": "PREC-289-2022-HCM",
+      "title": "Hồ sơ thực hành xét xử mẫu về xâm nhập trái phép hệ thống quản trị cơ sở dữ liệu qua lỗ hổng SQL Injection (Điều 289 BLHS)",
+      "court": "Tòa án nhân dân (Tổng hợp thực tiễn xét xử xâm nhập trái phép mạng máy tính)",
+      "decision_number": "TL-289/2022/HS-ST",
+      "decision_date": "2022-07-09",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-289-2022-hcm",
+      "material_facts": "Đối tượng khai thác lỗ hổng SQL Injection để vượt qua cơ chế xác thực cổng quản trị, chiếm quyền quản trị cao nhất (root/admin), tự ý tải về bản sao cơ sở dữ liệu giao dịch và thay đổi cấu hình truy cập.",
+      "legal_issue": "Xác định yếu tố 'cố ý vượt qua cảnh báo, mã truy cập, tường lửa hoặc sử dụng quyền quản trị của người khác' theo Điều 289 Bộ luật Hình sự.",
+      "holding": "Việc lợi dụng lỗ hổng bảo mật ứng dụng web để vượt qua cơ chế xác thực và đọc, ghi cơ sở dữ liệu nội bộ không được công khai cấu thành hành vi cố ý xâm nhập trái phép theo Điều 289 BLHS, kể cả khi bị cáo biện minh là 'kiểm tra bảo mật tự phát' không có hợp đồng ủy quyền.",
+      "reasoning": "Hoạt động kiểm thử xâm nhập (pentest) hợp pháp bắt buộc phải có văn bản ủy quyền hoặc phạm vi chương trình bug bounty rõ ràng từ chủ sở hữu hệ thống. Mọi hành vi khai thác vượt quyền để chiếm đoạt hoặc thay đổi dữ liệu đều vi phạm Điều 8 Luật An ninh mạng.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "289",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Người nào cố ý vượt qua cảnh báo, mã truy cập, tường lửa, sử dụng quyền quản trị của người khác hoặc bằng phương thức khác xâm nhập trái phép vào mạng máy tính, mạng viễn thông hoặc phương tiện điện tử của người khác chiếm quyền điều khiển."
+        },
+        {
+          "doc_code": "24/2018/QH14",
+          "article_number": "8",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Nghiêm cấm hành vi xâm nhập trái phép vào hệ thống thông tin và mạng viễn thông."
+        },
+        {
+          "doc_code": "116/2025/QH15",
+          "article_number": "8",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Nghiêm cấm hành vi xâm nhập, can thiệp, gây rối loạn hoặc chiếm quyền điều khiển hệ thống thông tin."
+        }
+      ],
+      "tags": ["BLHS Điều 289", "xâm nhập trái phép", "SQL injection", "Luật An ninh mạng"]
+    },
+    {
+      "id": "PREC-290-2024-CT",
+      "title": "Hồ sơ thực hành xét xử mẫu về dùng trạm BTS giả phát tán tin nhắn SMS thương hiệu giả mạo chiếm đoạt tài sản (Điều 290 BLHS)",
+      "court": "Tòa án nhân dân (Tổng hợp thực tiễn xét xử lừa đảo qua mạng viễn thông)",
+      "decision_number": "TL-290/2024/HS-ST",
+      "decision_date": "2024-03-21",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-290-2024-ct",
+      "material_facts": "Các bị cáo đặt thiết bị thu phát sóng BTS giả trong xe ô tô di chuyển tại khu vực đông dân cư để chèn tin nhắn SMS Brandname giả mạo ngân hàng kèm đường link đăng nhập giả nhằm đánh cắp mã OTP và chiếm đoạt tiền trong tài khoản nạn nhân.",
+      "legal_issue": "Áp dụng Điều 290 BLHS đối với thủ đoạn sử dụng mạng viễn thông, thiết bị vô tuyến giả mạo giao dịch thanh toán điện tử nhằm chiếm đoạt tài sản.",
+      "holding": "Hành vi sử dụng thiết bị phát sóng bất hợp pháp để mạo danh tin nhắn ngân hàng dẫn dụ người dùng nhập thông tin xác thực thanh toán điện tử và chiếm đoạt tiền đủ yếu tố cấu thành tội sử dụng mạng máy tính, mạng viễn thông, phương tiện điện tử thực hiện hành vi chiếm đoạt tài sản theo Điều 290 BLHS.",
+      "reasoning": "So với tội lừa đảo chiếm đoạt tài sản thông thường, việc can thiệp vào hạ tầng viễn thông, giả mạo tên định danh SMS và chiếm đoạt quyền truy cập tài khoản thanh toán là phương thức đặc trưng của Điều 290 BLHS, đồng thời vi phạm các quy định về quản lý tin nhắn rác, cuộc gọi rác tại Nghị định 15/2020/NĐ-CP và Nghị định 174/2026/NĐ-CP.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "290",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Người nào sử dụng mạng máy tính, mạng viễn thông hoặc phương tiện điện tử thực hiện hành vi chiếm đoạt tài sản thì bị xử lý theo Điều 290 Bộ luật Hình sự."
+        },
+        {
+          "doc_code": "15/2020/NĐ-CP",
+          "article_number": "94",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Quy định xử phạt hành chính đối với hành vi vi phạm quy định về chống thư rác, tin nhắn rác, cuộc gọi rác."
+        },
+        {
+          "doc_code": "174/2026/NĐ-CP",
+          "article_number": "89",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Quy định xử phạt đối với hành vi vi phạm quy định về gửi tin nhắn, thư điện tử, gọi điện thoại rác và giả mạo tên định danh."
+        }
+      ],
+      "tags": ["BLHS Điều 290", "BTS giả", "phishing", "tin nhắn giả mạo", "OTP"]
+    },
+    {
+      "id": "PREC-ETX-2023-HN",
+      "title": "Hồ sơ thực hành xét xử mẫu về giá trị chứng cứ của thông điệp dữ liệu và email xác nhận trong hợp đồng phần mềm (Luật 20/2023/QH15)",
+      "court": "Tòa án nhân dân (Tổng hợp thực tiễn xét xử tranh chấp kinh doanh thương mại)",
+      "decision_number": "TL-ETX/2023/KDTM-PT",
+      "decision_date": "2023-12-05",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-etx-2023-hn",
+      "material_facts": "Hai doanh nghiệp ký phụ lục nghiệm thu phần mềm và xác nhận khối lượng phát sinh qua hệ thống email tên miền doanh nghiệp và hệ thống ký số nội bộ nhưng một bên sau đó phủ nhận hiệu lực vì cho rằng chưa in ký đóng dấu bản giấy.",
+      "legal_issue": "Điều kiện công nhận giá trị pháp lý như bản gốc và giá trị làm chứng cứ của thông điệp dữ liệu theo Luật Giao dịch điện tử và Bộ luật Dân sự.",
+      "holding": "Thông điệp dữ liệu (email công vụ, biên bản nghiệm thu điện tử) không bị phủ nhận giá trị pháp lý chỉ vì được thể hiện dưới dạng dữ liệu điện tử nếu bảo đảm độ tin cậy về nguồn gốc người gửi và tính toàn vẹn nội dung trong quá trình lưu trữ, truyền gửi.",
+      "reasoning": "Căn cứ nguyên tắc tại Luật Giao dịch điện tử 20/2023/QH15 Điều 8 và Điều 11 cùng quy định về hình thức giao dịch điện tử tại Điều 119 Bộ luật Dân sự 91/2015/QH13, dữ liệu log máy chủ thư điện tử, mã băm tệp đính kèm và chuỗi trao đổi phản hồi liên tục đủ căn cứ xác lập nghĩa vụ thanh toán.",
+      "references": [
+        {
+          "doc_code": "20/2023/QH15",
+          "article_number": "8",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Thông điệp dữ liệu không bị phủ nhận giá trị pháp lý chỉ vì thông điệp đó được thể hiện dưới dạng thông điệp dữ liệu."
+        },
+        {
+          "doc_code": "20/2023/QH15",
+          "article_number": "11",
+          "clause_number": 1,
+          "relation": "INTERPRETS",
+          "supporting_quote": "Thông điệp dữ liệu có giá trị dùng làm chứng cứ được xác định dựa trên độ tin cậy của cách thức khởi tạo, gửi, nhận hoặc lưu trữ thông điệp dữ liệu."
+        },
+        {
+          "doc_code": "15/2020/NĐ-CP",
+          "article_number": "107",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Vi phạm quy định về khởi tạo, gửi, nhận và lưu trữ thông điệp dữ liệu trong giao dịch điện tử."
+        },
+        {
+          "doc_code": "91/2015/QH13",
+          "article_number": "119",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Giao dịch dân sự thông qua phương tiện điện tử dưới hình thức thông điệp dữ liệu theo quy định của pháp luật về giao dịch điện tử được coi là giao dịch bằng văn bản."
+        }
+      ],
+      "tags": ["giao dịch điện tử", "thông điệp dữ liệu", "email chứng cứ", "Luật 20/2023/QH15"]
+    },
+    {
+      "id": "PREC-SNS-2024-HP",
+      "title": "Hồ sơ thực hành xét xử mẫu về giả mạo trang thông tin điện tử và đăng tải thông tin sai sự thật trên mạng xã hội (NĐ 15/2020 & NĐ 174/2026)",
+      "court": "Tòa án nhân dân (Tổng hợp thực tiễn xét xử hành chính & dân sự trên không gian mạng)",
+      "decision_number": "TL-SNS/2024/HC-ST",
+      "decision_date": "2024-09-10",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-sns-2024-hp",
+      "material_facts": "Cá nhân thiết lập trang thông tin điện tử tổng hợp không phép có giao diện mô phỏng cổng thông tin doanh nghiệp tài chính và đăng tải bài viết sai sự thật trên mạng xã hội nhằm xúc phạm uy tín, gây hoang mang khách hàng.",
+      "legal_issue": "Phân biệt áp dụng Điều 99 (trang thông tin điện tử giả mạo/không phép) và Điều 101 (trách nhiệm sử dụng dịch vụ mạng xã hội) Nghị định 15/2020/NĐ-CP (nay chuyển tiếp sang Điều 94, 95 Nghị định 174/2026/NĐ-CP).",
+      "holding": "Hành vi lập website giả mạo hoặc thiết lập trang thông tin điện tử tổng hợp không có giấy phép bị xử lý theo Điều 99 Nghị định 15/2020/NĐ-CP (hoặc Điều 94 Nghị định 174/2026/NĐ-CP từ 01/07/2026), tách bạch với hành vi đăng tải, chia sẻ thông tin giả mạo, sai sự thật trên mạng xã hội theo Điều 101 (Điều 95 NĐ 174/2026); trường hợp cá nhân vi phạm áp dụng mức phạt bằng 1/2 mức phạt của tổ chức.",
+      "reasoning": "Việc tách hành vi giúp áp dụng đúng từng điều khoản và buộc thực hiện biện pháp khắc phục hậu quả gồm gỡ bỏ thông tin sai sự thật và thu hồi tên miền vi phạm theo quy định hiện hành từng giai đoạn.",
+      "references": [
+        {
+          "doc_code": "15/2020/NĐ-CP",
+          "article_number": "99",
+          "clause_number": 3,
+          "relation": "APPLIES",
+          "supporting_quote": "Đưa thông tin sai sự thật, xuyên tạc, vu khống, xúc phạm uy tín của tổ chức, danh dự và nhân phẩm của cá nhân trên trang thông tin điện tử."
+        },
+        {
+          "doc_code": "15/2020/NĐ-CP",
+          "article_number": "101",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Lợi dụng mạng xã hội để cung cấp, chia sẻ thông tin giả mạo, thông tin sai sự thật, xuyên tạc, vu khống, xúc phạm uy tín của cơ quan, tổ chức."
+        },
+        {
+          "doc_code": "174/2026/NĐ-CP",
+          "article_number": "95",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Quy định chuyển tiếp xử phạt vi phạm quy định về trách nhiệm sử dụng dịch vụ mạng xã hội từ ngày 01/07/2026."
+        },
+        {
+          "doc_code": "24/2018/QH14",
+          "article_number": "16",
+          "clause_number": 1,
+          "relation": "CITES",
+          "supporting_quote": "Phòng ngừa, xử lý thông tin trên không gian mạng có nội dung làm nhục, vu khống, xâm phạm trật tự quản lý kinh tế."
+        }
+      ],
+      "tags": ["mạng xã hội", "tin sai sự thật", "Điều 101", "Điều 99", "Nghị định 174/2026"]
+    }
+  ]
+}

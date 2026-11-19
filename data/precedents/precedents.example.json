@@ -1,3 +1,28 @@
 {
-  "precedents": []
+  "precedents": [
+    {
+      "id": "PREC-285-2023-HCM",
+      "title": "Hồ sơ thực hành xét xử mẫu về sản xuất, mua bán phần mềm theo dõi thiết bị di động trái phép (Điều 285 BLHS)",
+      "court": "Tòa án nhân dân cấp sơ thẩm (Tổng hợp thực tiễn xét xử tội phạm mạng)",
+      "decision_number": "TL-285/2023/HS-ST",
+      "decision_date": "2023-08-18",
+      "status": "UNKNOWN",
+      "status_source": null,
+      "source_url": "https://congbobanan.toaan.gov.vn/2ba-prec-285-2023-hcm",
+      "material_facts": "Bị cáo thiết kế và rao bán phần mềm cài đặt ngầm trên điện thoại thông minh nhằm thu thập nhật ký cuộc gọi, tin nhắn SMS và tọa độ định vị của người dùng mà không có sự đồng ý, thu lợi bất chính hơn 320 triệu đồng trên nhiều tỉnh, thành phố.",
+      "legal_issue": "Xác định cấu thành tội sản xuất, mua bán, trao đổi hoặc tặng cho công cụ, thiết bị, phần mềm để sử dụng vào mục đích trái pháp luật theo Điều 285 Bộ luật Hình sự.",
+      "holding": "Phần mềm có tính năng ẩn giao diện và tự động trích xuất dữ liệu cá nhân trái phép từ thiết bị đầu cuối được xác định là 'phần mềm có tính năng tấn công, xâm nhập mạng máy tính' theo Điều 285 BLHS; hành vi phát triển để bán thương mại đủ căn cứ truy cứu trách nhiệm hình sự.",
+      "reasoning": "Hội đồng xét xử đối chiếu chức năng kỹ thuật thực tế của mã nguồn thay cho tên gọi thương mại do bị cáo đặt. Khi công cụ vượt qua cơ chế kiểm soát quyền truy cập và thu thập lén lút dữ liệu, hành vi thỏa mãn dấu hiệu định tội tại Điều 285 BLHS.",
+      "references": [
+        {
+          "doc_code": "100/2015/QH13",
+          "article_number": "285",
+          "clause_number": 1,
+          "relation": "APPLIES",
+          "supporting_quote": "Người nào sản xuất, mua bán, trao đổi hoặc tặng cho công cụ, thiết bị, phần mềm có tính năng tấn công mạng máy tính, mạng viễn thông, phương tiện điện tử để sử dụng vào mục đích trái pháp luật thì bị phạt tiền hoặc phạt tù."
+        }
+      ],
+      "tags": ["BLHS Điều 285", "phần mềm gián điệp"]
+    }
+  ]
 }
