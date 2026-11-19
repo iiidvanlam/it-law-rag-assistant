@@ -13,6 +13,11 @@ services:
       - "127.0.0.1:5433:5432"
     volumes:
       - law_graph_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d law_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # Khối Symbolic: Neo4j 5 (đồ thị tri thức pháp lý + vector index cho hành vi)
   neo4j:

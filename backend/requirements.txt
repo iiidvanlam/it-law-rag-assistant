@@ -18,3 +18,5 @@ langchain-google-genai==4.4.2
 protobuf==6.33.6
 Pillow==12.3.0
 SQLAlchemy==2.1.6
+google-auth==2.62.0
+requests==2.34.2
